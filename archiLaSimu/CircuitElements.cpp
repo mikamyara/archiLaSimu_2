@@ -330,7 +330,7 @@ IOBox::drawName(ImDrawList* dl,ImVec2 window_pos) {
     //std::cout << pos.x << " " << pos.y << " " << mName << " " << mNameColor << " " <<mRectPos.x << "\n";
 }
 
-  
+
 
 
 
@@ -367,6 +367,8 @@ RegisterBus123::RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos):IO
     buf[5]=0;
 
     mInputTextLabel = "##"+mName;
+    
+    mInputTextWidth = 60;
 }
 
  
@@ -376,8 +378,8 @@ RegisterBus123::drawOutputNodes(ImDrawList* dl,ImVec2 window_pos) {
     ImU32 busColor ;
     const IOBoxNodes& theNodes = mOutputs;
     for(k=0;k<theNodes.size();k++) {
-        if(busColor %2 == 0 )  {busColor = gArchiTheme.mBus2Color;}
-        else {busColor = gArchiTheme.mBus1Color;}
+        if(theNodes[k] == mBus1Node )  {busColor = gArchiTheme.mBus1Color;}
+        else {busColor = gArchiTheme.mBus2Color;}
         drawNode(dl,window_pos,theNodes,k,busColor);
      }
 }
@@ -395,13 +397,18 @@ RegisterBus123::draw(ImDrawList* dl, ImVec2 window_pos){
 
 IOBox::draw(dl,window_pos);
 drawLabels(dl,window_pos);
-ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 5,mPos.y + window_pos.y + mRectPos.y + 30);
-ImGui::SetCursorPos (labelPos);
 
-ImGui::PushItemWidth(70);
-ImGui::InputText(mInputTextLabel.c_str(), buf, 6,ImGuiInputTextFlags_CharsDecimal);
-ImGui::PopItemWidth();
+drawInputText(dl,window_pos);
+}
 
+
+void     
+RegisterBus123::drawInputText(ImDrawList* dl,ImVec2 window_pos){
+    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);   
+    ImGui::SetCursorPos (labelPos);
+    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::InputText(mInputTextLabel.c_str(), buf, 6,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::PopItemWidth();
 }
 
 
@@ -483,16 +490,90 @@ mOutputs.push_back(new Node());
 
 }
  
-////--------------------Utilities-----------------------
-ImVec2  HVPos(ImVec2 HNode, ImVec2 VNode)
-{ return ImVec2(HNode.x,VNode.y);
+
+
+
+
+
+//------------------------- CombinatorialOperator ----------------------
+
+
+CombinatorialOperator::CombinatorialOperator(std::string inName,ImU32 inColor,ImVec2 inPos):RegisterBus123(inName,inColor,inPos)
+{
+mOutputs.mPosMode=e_Top; 
+mInputs.mPosMode=e_Bottom;
+mRectSize = {120,130};
+Node* swap = mBus1Node;
+mBus1Node = mBus2Node;
+mBus2Node = swap;
 }
 
-ImVec2 HExt(ImVec2 Node, int ext)
-{  return ImVec2(Node.x+ext,Node.y);
+void 
+CombinatorialOperator::draw(ImDrawList* dl, ImVec2 window_pos){
+
+    IOBox::draw(dl,window_pos);
+
+    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);
+    ImGui::SetCursorPos (labelPos);
+    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::InputText(mInputTextLabel.c_str(), buf, 6);
+    ImGui::PopItemWidth();
+
 }
 
-ImVec2 VExt(ImVec2 Node, int ext)
-{  return ImVec2(Node.x,Node.y+ext);
+
+
+
+void    
+CombinatorialOperator::drawName(ImDrawList* dl,ImVec2 window_pos) {
+    ImVec2 pos;
+    pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + mBus1Node->mPos.x,mPos.y + window_pos.y + mRectPos.y + 5);
+    addAlignedText(dl,pos,eTextCenter,"X",mNameColor,gArchiTheme.mRobotoBoldFont,24);
+    pos.x = mPos.x + window_pos.x + mRectPos.x + mBus2Node->mPos.x;
+    addAlignedText(dl,pos,eTextCenter,"Y",mNameColor,gArchiTheme.mRobotoBoldFont,24);
+
+    
+    
+    pos = ImVec2(mPos.x+window_pos.x+mRectPos.x+mRectSize.x/2,mPos.y+window_pos.y+mRectPos.y+mRectSize.y-50);
+    addAlignedText(dl,pos,eTextCenter,"Opérateur",mNameColor,gArchiTheme.mRobotoBoldFont,21);
+    pos.y+=23;
+    addAlignedText(dl,pos,eTextCenter,"Combinatoire",mNameColor,gArchiTheme.mRobotoBoldFont,21);
+
 }
- 
+
+  
+
+
+//------------------------- InstructionRegisterWidget ----------------------
+InstructionRegister::InstructionRegister( ) {
+
+}
+InstructionRegister::InstructionRegister(std::string inName,ImU32 inColor,ImVec2 inPos):RegisterBus123(inName,inColor,inPos) {
+    mRectSize = {190,90};
+    mFormaterInputTextLabel = mInputTextLabel + "F";
+}
+void
+InstructionRegister::drawName(ImDrawList* dl,ImVec2 window_pos) {
+    RegisterBus123::drawName(dl,window_pos);
+    ImVec2 pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + mRectSize.x/4,mPos.y + window_pos.y + mRectPos.y + 28);
+    addAlignedText(dl,pos,eTextCenter,"OPCode",mNameColor,gArchiTheme.mRobotoFont,20);
+    pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + mRectSize.x*3/4,mPos.y + window_pos.y + mRectPos.y + 28);
+    addAlignedText(dl,pos,eTextCenter,"Formatteur",mNameColor,gArchiTheme.mRobotoFont,20);
+
+}
+
+void     
+InstructionRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos){
+    ImVec2 pos = ImVec2(mPos.x + window_pos.x + mRectPos.x+20,mPos.y + window_pos.y + mRectPos.y+55);
+    ImGui::SetCursorPos (pos);
+    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::InputText(mInputTextLabel.c_str(), buf, 6,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::PopItemWidth();
+    pos.x += mRectSize.x/2;
+    ImGui::SetCursorPos (pos);
+    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::InputText(mFormaterInputTextLabel.c_str(), buf, 6,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::PopItemWidth();    
+
+}
+

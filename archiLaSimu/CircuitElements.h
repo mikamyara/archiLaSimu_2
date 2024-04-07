@@ -4,8 +4,6 @@
 #include <string>
 #include <imgui.h>
 
-//                ImU32 col_a = ImGui::GetColorU32(IM_COL32(0, 0, 0, 255));
-
 
 enum eSignalStatus { normal,selected,error};
 
@@ -95,18 +93,43 @@ class RegisterBus123:public IOBox{
     virtual void drawLabels(ImDrawList* dl,ImVec2 window_pos);
     virtual  void    drawInputNodes(ImDrawList* dl,ImVec2 window_pos);
     virtual  void    drawOutputNodes(ImDrawList* dl,ImVec2 window_pos);    
+    virtual void     drawInputText(ImDrawList* dl,ImVec2 window_pos);
+
 
     // general data
     int mValue;
     char buf[6];
-    std::string mInputTextLabel;
+    std::string mInputTextLabel,mFormaterInputTextLabel;
     Node *mBus1Node,*mBus2Node,*mBus3Node;
-
-    // architecture view related data
-
-//    bool showBus1,showBus2,showBus3;
+    int mInputTextWidth;
 
 };
+
+
+////----------------CombinatorialOperator-----------------------
+
+
+class CombinatorialOperator:public RegisterBus123 {
+    public:
+        CombinatorialOperator();
+        CombinatorialOperator(std::string inName,ImU32 inColor,ImVec2 inPos);
+        
+        virtual void draw(ImDrawList* dl, ImVec2 window_pos);
+        virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
+   
+};
+////----------------CombinatorialOperator-----------------------
+
+class InstructionRegister:public RegisterBus123 {
+    public:
+    InstructionRegister();
+    InstructionRegister(std::string inName,ImU32 inColor,ImVec2 inPos);
+   // virtual void draw(ImDrawList* dl, ImVec2 window_pos);
+    virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
+    virtual void drawInputText(ImDrawList* dl,ImVec2 window_pos);
+
+};
+
 ////----------------Bus-----------------------
 
 class Bus {
