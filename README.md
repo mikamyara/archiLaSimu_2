@@ -1,5 +1,7 @@
 # archiLaSimu
 
+Essai de réécriture de archi_la_simu (vb) en C++ avec emscripten 3.1.48 + imGui (versio en ligne, a priori facile à rendre locale). 
+Début : 07 Avril 2024
 
 
 ## Getting started
