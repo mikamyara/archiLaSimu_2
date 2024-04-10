@@ -622,6 +622,29 @@ InstructionRegister::Rebuild() {
 }
 
 
+/////-------------MicrocodeRegister-----------
+MicrocodeRegister::MicrocodeRegister() {
+
+}
+MicrocodeRegister::MicrocodeRegister(ImVec2 inPos):IOBox("",0,inPos) {
+mColor = gArchiTheme.mMuxColor;
+mRectSize = {500,30};
+mInputs.mPosMode=e_Bottom;
+mOutputs.mPosMode=e_Top;
+mInputs.push_back(new Node());
+mOutputs.push_back(new Node());
+mOutputs.push_back(new Node());
+mWireLen = 5;
+}
+
+
+/*
+void
+MicrocodeRegister::drawOutputNodes(ImDrawList* dl,ImVec2 window_pos) {  ###
+    drawNodes(dl,window_pos,mOutputs,gArchiTheme.mBoxWireColor);
+
+}
+*/
 
 
 ////----------------Bus-----------------------

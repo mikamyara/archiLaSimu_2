@@ -8,16 +8,19 @@ Sequencer::Sequencer(CPU* inCPU){
     mPos = {800,100};
     SeIMS = nullptr; Cond = nullptr; Fin= nullptr;
     SeIMS = new MUX("SeIMS",4,{140,30});    allBoxes.push_back(SeIMS); SeIMS->minValue=0;  SeIMS->maxValue=4;
-    Fin = new MUX("Fin",2,{0,40});          allBoxes.push_back(Fin);   Fin->minValue=0;    Fin->maxValue=1;
-    Cond = new MUX("Cond",2,{290,60});      allBoxes.push_back(Cond);  Cond->minValue=0;   Cond->maxValue=1;
+    Cond = new MUX("Cond",2,{0,40});          allBoxes.push_back(Cond);   Cond->minValue=0;    Cond->maxValue=1;
+    Fin = new MUX("Fin",2,{290,60});      allBoxes.push_back(Fin);  Fin->minValue=0;   Fin->maxValue=1;
     Plus1 = new IOBox("PLUS1",0,{435,0});   allBoxes.push_back(Plus1); reskinIOBox(Plus1); Plus1->mRectSize={90,35}; Plus1->mInputs.mPosMode=e_Right;Plus1->mOutputs.mPosMode=e_Left;
     Plus1->mInputs.push_back(new Node());     
     Fetch      = new BasicRegister("Fetch",1,{230,120},3); allBoxes.push_back(Fetch); reskinIOBox(Fetch);
     OpCode     = new BasicRegister("OpCode",1,{30,120},3); allBoxes.push_back(OpCode); reskinIOBox(OpCode);
     Microcode  = new BasicRegister("Microcode",1,{430,55},3); allBoxes.push_back(Microcode); reskinIOBox(Microcode);  
-    Microcode->mInputs.push_back(new Node());      Microcode->mOutputs.mPosMode=e_Right; Microcode->mRectSize={100,70}; 
+    Microcode->mInputs.push_back(new Node());      Microcode->mOutputs.mPosMode=e_Right; Microcode->mRectSize={100,70};
 
-    mMuxesNames={"SeIMS","Fin","Cond"};
+    MicrocodeReg = new MicrocodeRegister({45,260});
+    allBoxes.push_back(MicrocodeReg) ;
+
+    mMuxesNames={"SeIMS","Cond","Fin"};
     mCPU = inCPU;
 
     mCodeTable = new MicrocodeTable(mCPU);
@@ -45,30 +48,30 @@ Sequencer::calcBus() {
     Bus* theBus = new Bus(Microcode->mOutputs[0],"",col,w) ;
     theBus->mStart->addNewWire(true)->setTarget(new Node("",HVPos(theBus->mStart->mLocalPos,Plus1->mInputs[0]->mLocalPos)))->addNewWire(true)->setTarget(Plus1->mInputs[0]);
     mBusses.push_back(theBus);
-    //  Plus1 to SeIMS to Fin
+    //  Plus1 to SeIMS to Cond
     theBus = new Bus(Plus1->mOutputs[0],"",col,w);
     theBus->mStart->addNewWire(true)->setTarget(new Node("Plus1SeIMS",HVPos(SeIMS->mInputs[0]->mLocalPos,theBus->mStart->mLocalPos)))->addNewWire(true)->setTarget(SeIMS->mInputs[0]);
-    theBus->FindNode("Plus1SeIMS")->addNewWire(true)->setTarget(new Node("",HVPos(Fin->mInputs[0]->mLocalPos,Plus1->mOutputs[0]->mLocalPos)))->addNewWire(true)->setTarget(Fin->mInputs[0]);
+    theBus->FindNode("Plus1SeIMS")->addNewWire(true)->setTarget(new Node("",HVPos(Cond->mInputs[0]->mLocalPos,Plus1->mOutputs[0]->mLocalPos)))->addNewWire(true)->setTarget(Cond->mInputs[0]);
     mBusses.push_back(theBus);
-    // Fin to SeIMS
-    theBus = new Bus(Fin->mOutputs[0],"",col,w);
+    // Cond to SeIMS
+    theBus = new Bus(Cond->mOutputs[0],"",col,w);
     theBus->mStart->addNewWire(true)->setTarget(SeIMS->mInputs[1]);
     mBusses.push_back(theBus);
-    // SeIMS to Cond
+    // SeIMS to Fin
     theBus = new Bus(SeIMS->mOutputs[0],"",col,w);
-    theBus->mStart->addNewWire(true)->setTarget(Cond->mInputs[0]);
-    mBusses.push_back(theBus);
-    // Cond to Microcode
-    theBus = new Bus(Cond->mOutputs[0],"",col,w);
+    theBus->mStart->addNewWire(true)->setTarget(Fin->mInputs[0]);
+    mBusses.push_back(theBus);    
+    // Fin to Microcode
+    theBus = new Bus(Fin->mOutputs[0],"",col,w);
     theBus->mStart->addNewWire(true)->setTarget(Microcode->mInputs[0]);
     mBusses.push_back(theBus);
     // OpCode to SeIMS
     theBus = new Bus(OpCode->mOutputs[0],"",col,w);
     theBus->mStart->addNewWire(true)->setTarget(SeIMS->mInputs[2]);
-    mBusses.push_back(theBus);
-    // Fetch to Cond
+    mBusses.push_back(theBus); 
+    // Fetch to Fin
     theBus = new Bus(Fetch->mOutputs[0],"",col,w);
-    theBus->mStart->addNewWire(true)->setTarget(Cond->mInputs[1]);
+    theBus->mStart->addNewWire(true)->setTarget(Fin->mInputs[1]);
     mBusses.push_back(theBus);
 
 }
@@ -112,7 +115,7 @@ Sequencer::drawWidgets(ImDrawList* dl, ImVec2 pos){
         allBoxes[k]->drawWidgets(dl,thePos);
     }
     ImVec2 themCodeVec = thePos;
-    themCodeVec.y+=310;
+    themCodeVec.y+=300;
     themCodeVec.x+=10;
     mCodeTable->drawWidgets(dl,themCodeVec);
 }

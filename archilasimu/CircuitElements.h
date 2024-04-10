@@ -156,6 +156,17 @@ class InstructionRegister:public RegisterBus123 {
 
 };
 
+
+/////-------------MicrocodeRegister-----------
+class MicrocodeRegister: public IOBox {
+public :
+    MicrocodeRegister();
+    MicrocodeRegister(ImVec2 inPos);
+    //virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
+};
+
+
+
 ////----------------Bus-----------------------
 
 class Bus {

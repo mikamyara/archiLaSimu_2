@@ -129,8 +129,6 @@ MicrocodeTable::Rebuild ()
     {
       mShortViewColNames[k] = new char[30];
       mShortViewStrings[k] = new char[100];
-      mShortViewColNames[k][0]=0;
-      mShortViewStrings[k][0]=0;
     }
   mShortViewCols = 6;
   for (k = 0; k < 5; k++)
@@ -149,6 +147,9 @@ MicrocodeTable::Rebuild ()
 void
 MicrocodeTable::drawWidgets (ImDrawList * dl, ImVec2 window_pos)
 {
+
+
+
 
   ImGui::SetCursorPos (window_pos);
 
@@ -205,8 +206,9 @@ MicrocodeTable::ShortMicroCodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 
   static int frozen_cols = 1;
   static int frozen_rows = 2;
-  if (ImGui::BeginTable ("table_angled_headers", mShortViewCols, table_flags,
-			 ImVec2 (550, 275)))
+  if (ImGui::
+      BeginTable ("table_angled_headers", mShortViewCols, table_flags,
+		  ImVec2 (550, 275)))
     {
       //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
       for (int n = 0; n < mShortViewCols; n++)
@@ -241,7 +243,7 @@ MicrocodeTable::ShortMicroCodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 		  }
 		else if (column == 5)
 		  {
-		    ImGui::PushItemWidth (300);
+		    ImGui::PushItemWidth (200);
 		    ImGui::InputText ("", mShortViewStrings[row], 100);
 		    ImGui::PopItemWidth ();
 		  }
@@ -270,8 +272,9 @@ MicrocodeTable::MainMicrocodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 
   static int frozen_cols = 1;
   static int frozen_rows = 2;
-  if (ImGui::BeginTable ("table_angled_headers", mCols, table_flags,
-			 ImVec2 (550, 275)))
+  if (ImGui::
+      BeginTable ("table_angled_headers", mCols, table_flags,
+		  ImVec2 (550, 275)))
     {
       //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
       for (int n = 0; n < mCols; n++)
@@ -431,8 +434,7 @@ std::string MicrocodeTable::toUpper (std::string str)
 
   std::transform (str.begin (), str.end (), str.begin (),[](unsigned char c)
 		  {
-		  return std::toupper (c);
-		  }
+		  return std::toupper (c);}
   );
   return str;
 }

@@ -9,7 +9,10 @@ class CPU;
 class MicrocodeTable {
 public :
 MicrocodeTable(CPU* inCPU);
-void    drawWidgets(ImDrawList* dl, ImVec2 window_pos);
+
+void    ShortMicroCodeTableWidget(ImDrawList* dl, ImVec2 window_pos);
+void    MainMicrocodeTableWidget(ImDrawList* dl, ImVec2 window_pos);
+void    drawWidgets(ImDrawList* dl, ImVec2 window_pos); 
 void    Rebuild();
 bool    insertByExpression(std::string expr);
 bool matchMicrocodeExpression (std::string s,
@@ -36,6 +39,10 @@ std::vector<char*> mAdrSuiv;
 char** mSeIMSMenu;
 bool** mSignals;
 std::map<std::string, int>  sigToCol;
+
+int mShortViewCols;
+char** mShortViewColNames;
+char** mShortViewStrings;
 
 };
 
