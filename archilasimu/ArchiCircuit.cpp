@@ -4,7 +4,14 @@
 
 ArchiCircuit::ArchiCircuit() {
 
-    mPos = ImVec2(15,80);
+    mB1signals = {"REB1","RAB1","RBB1","RCB1","RDB1","RXB1","RIB1","COB1"};
+    mB2signals = {"REB2","RAB2","RBB2","RCB2","RDB2","RXB2","RIB2","COB2"};
+    mB3signals = {"eRE","eRA","eRB","eRC","eRD","eRX","eRI","eCO","eRAM"};
+    mOtherSignals = {"sM","eM"};
+
+
+
+    mPos = ImVec2(15,150);
     RA = new RegisterBus123("RA",IM_COL32(0,50,50,255),ImVec2(380,100)); 
     RB = new RegisterBus123("RB",IM_COL32(0,60,60,255),ImVec2(380,190)); 
     RC = new RegisterBus123("RC",IM_COL32(0,70,70,255),ImVec2(380,280)); 
@@ -138,3 +145,16 @@ ArchiCircuit::draw(ImDrawList* dl, ImVec2 window_pos){
     }    
 }
 
+
+
+void     
+ArchiCircuit::drawWidgets(ImDrawList* dl, ImVec2 pos){
+    ImVec2 thePos = ImVec2(pos.x + mPos.x,pos.y + mPos.y);
+    int k;
+    for(k=0;k<allRegisters.size();k++) {
+        allRegisters[k]->drawWidgets(dl,thePos);
+    }
+}
+
+
+ 

@@ -9,6 +9,7 @@
 #include <GL/glew.h>
 #include <stdio.h>
 
+#include <iostream>
 
 
 ArchiLaSimuApp::ArchiLaSimuApp ():imGuiApp ()
@@ -32,8 +33,8 @@ gArchiTheme.LoadFonts(m_io);
   m_customFont = gArchiTheme.mRobotoFont;
 
 mCPU = new CPU();
+mCPU->Rebuild();
 mRAM = new RAM();
-
 //mArchiCircuit = new ArchiCircuit();
 //mArchiCircuit->Rebuild();
 
@@ -59,18 +60,41 @@ ArchiLaSimuApp::drawMainWindow() {
   int windowFlags =
       ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration |
       ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoBringToFrontOnFocus;
+      ImGuiWindowFlags_NoBringToFrontOnFocus |ImGuiWindowFlags_HorizontalScrollbar |ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
-    static float f = 0.0f;
-    static int counter = 0;
+  static float f = 0.0f;
+  static int counter = 0;
 
-    ImGui::PushFont (m_customFont);
-    ImGui::Begin ("Hello, world!", NULL, windowFlags);	// Create a window called "Hello, world!" and append into it.
-    ImDrawList *draw_list = ImGui::GetWindowDrawList ();
-    ImVec2 window_pos = ImGui::GetWindowPos ();
+  ImGui::SetNextWindowContentSize(ImVec2(1835,0.0f));
+  ImGui::PushFont (m_customFont);
+  ImGui::Begin ("Hello, world!", NULL, windowFlags);	// Create a window called "Hello, world!" and append into it.
+  ImDrawList *draw_list = ImGui::GetWindowDrawList ();
+  ImVec2 window_pos = ImGui::GetWindowPos ();
+  ImVec2 scroll_pos = window_pos;
+  scroll_pos.x -= ImGui::GetScrollX();
+  scroll_pos.y -= ImGui::GetScrollY();
+    
+  mCPU->draw(draw_list,scroll_pos);
+  mCPU->drawWidgets(draw_list,window_pos);
 
-    mCPU->draw(draw_list,window_pos);
-    mRAM->draw(draw_list,window_pos);
+  mRAM->draw(draw_list,scroll_pos);
+ mRAM->drawWidgets(draw_list,window_pos);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     ImGui::Text ("This is some useful text.");	// Display some text (you can use a format strings too)
     ImGui::Checkbox ("Demo Window", &m_show_demo_window);	// Edit bools storing our window open/close state
@@ -84,8 +108,8 @@ ArchiLaSimuApp::drawMainWindow() {
     ImGui::SameLine ();
     ImGui::Text ("counter = %d", counter);
     ImGui::SetCursorPos (ImVec2 (500, 500));
-    ImGui::Text ("Application average %.3f ms/frame (%.1f FPS)",
-		 1000.0f / m_io->Framerate, m_io->Framerate);
+    //ImGui::Text ("Application average %.3f ms/frame (%.1f FPS)",
+		// 1000.0f / m_io->Framerate, m_io->Framerate);  
     ImGui::End ();
     ImGui::PopFont ();
 }

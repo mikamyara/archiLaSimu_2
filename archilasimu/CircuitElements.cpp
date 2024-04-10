@@ -64,8 +64,8 @@ Node::drawWires(ImDrawList* dl,ImU32 inBusColor,float inThickness,ImVec2 inAbsPo
             ImVec2 P1,P2;
             P1 =  ImVec2( (int)(inAbsPos.x + mLocalPos.x)                ,(int)(inAbsPos.y + mLocalPos.y) );
             P2 =  ImVec2( (int)(inAbsPos.x + destNode->mLocalPos.x)      ,(int)(inAbsPos.y + destNode->mLocalPos.y));
+            dl->AddCircleFilled(P1,((int)inThickness)/2,inBusColor);
             dl->AddLine(P1, P2, inBusColor, inThickness);
-            
             dl->AddCircleFilled(P2,((int)inThickness)/2,inBusColor);
 
 
@@ -100,6 +100,10 @@ Node::changeStatus(Node* target,eSignalStatus newStatus){
     return false;
     }
 }
+
+
+
+
 /////---------------IOBox---------------
 IOBoxNodes::IOBoxNodes():vector<Node*>() {
     mPosMode = e_Left;
@@ -248,6 +252,10 @@ IOBox::RebuildLocalCoords() {
 }
 
 
+void
+IOBox::drawWidgets(ImDrawList* dl, ImVec2 pos){
+
+}
 
 
 void
@@ -304,8 +312,8 @@ IOBox::drawBox(ImDrawList* dl,ImVec2 window_pos) {
 
     thePosMin = ImVec2(window_pos.x + mPos.x + mRectPos.x , window_pos.y + mPos.y + mRectPos.y );
     thePosMax = ImVec2 (thePosMin.x + mRectSize.x, thePosMin.y + mRectSize.y);
-    dl->AddRectFilled (thePosMin, thePosMax, mColor);  
-    dl->AddRect(thePosMin, thePosMax, mBorderColor, 0.0f, ImDrawFlags_None, 6.0f);
+   dl->AddRect(thePosMin, thePosMax, mBorderColor, 0.0f, ImDrawFlags_None, 6.0f);
+   dl->AddRectFilled (thePosMin, thePosMax, mColor);  
 }
 
 
@@ -324,18 +332,72 @@ IOBox::drawName(ImDrawList* dl,ImVec2 window_pos) {
 
 
 
+////---------------BasicRegister----------------
+BasicRegister::BasicRegister():IOBox("",0,{0,0}) {}
+
+BasicRegister::BasicRegister(std::string inName,ImU32 inColor,ImVec2 inPos,int textSize):IOBox(inName,inColor,inPos) {
+    mTextBufSize = textSize +1; // a bit arbitrary
+    buf = new char[mTextBufSize];
+    for(int k=0;k<mTextBufSize-1;k++) { buf[k] ='0';}
+    buf[mTextBufSize-1]=0;
+
+    mInputTextLabel = "##"+mName;
+    mInputTextWidth = (mTextBufSize-1)*11;
+}
+void     
+BasicRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos){
+    
+    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);   
+    ImGui::SetCursorPos (labelPos);
+    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::InputText(mInputTextLabel.c_str(), buf, mTextBufSize,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::PopItemWidth();
+}
+
+void 
+BasicRegister::draw(ImDrawList* dl, ImVec2 window_pos){
+
+IOBox::draw(dl,window_pos);
+//drawInputText(dl,window_pos);
+}
 
 
 
+void
+BasicRegister::drawWidgets(ImDrawList* dl, ImVec2 pos){
+    drawInputText(dl,pos);
+}
 
+int
+BasicRegister::getValue()  { 
+ int val;
+ sscanf(buf,"%d",&val); 
+ return val;
+}
+
+int  
+BasicRegister::setValue(int val) { 
+  int ret = filterValue(val);
+  if(ret == 0 ) {
+   sprintf(buf,"%d",val);
+   }
+  return ret;
+} 
+
+int
+BasicRegister::filterValue(int val) const
+{
+  if(val < minValue ) return -2;
+  if(val > maxValue ) return -1;  
+  return 0;
+}
 
 
 ////---------------RegisterBus123----------------
-RegisterBus123::RegisterBus123():IOBox("",0,{0,0}) {}
+RegisterBus123::RegisterBus123():BasicRegister("",0,{0,0},5) {}
 
-RegisterBus123::RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos):IOBox(inName,inColor,inPos)
+RegisterBus123::RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos):BasicRegister(inName,inColor,inPos,5)
 {
-    mValue = 0;
     mRectSize = ImVec2(90,72);
     mWireLen = 55.0f;
     mBorderColor = inColor;
@@ -355,12 +417,7 @@ RegisterBus123::RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos):IO
         mBus3Node->mName = "e"+mName;
     }
 
-    for(int k=0;k<5;k++) { buf[k] ='0';}
-    buf[5]=0;
 
-    mInputTextLabel = "##"+mName;
-    
-    mInputTextWidth = 60;
 }
 
  
@@ -387,21 +444,13 @@ RegisterBus123::drawInputNodes(ImDrawList* dl,ImVec2 window_pos) {
 void 
 RegisterBus123::draw(ImDrawList* dl, ImVec2 window_pos){
 
-IOBox::draw(dl,window_pos);
+BasicRegister::draw(dl,window_pos);
 drawLabels(dl,window_pos);
 
-drawInputText(dl,window_pos);
 }
 
 
-void     
-RegisterBus123::drawInputText(ImDrawList* dl,ImVec2 window_pos){
-    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);   
-    ImGui::SetCursorPos (labelPos);
-    ImGui::PushItemWidth(mInputTextWidth);
-    ImGui::InputText(mInputTextLabel.c_str(), buf, 6,ImGuiInputTextFlags_CharsDecimal);
-    ImGui::PopItemWidth();
-}
+
 
 
 void 
@@ -459,19 +508,14 @@ mRectSize = {120,130};
 Node* swap = mBus1Node;
 mBus1Node = mBus2Node;
 mBus2Node = swap;
+buildOperations();
+
 }
 
 void 
 CombinatorialOperator::draw(ImDrawList* dl, ImVec2 window_pos){
 
     IOBox::draw(dl,window_pos);
-
-    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);
-    ImGui::SetCursorPos (labelPos);
-    ImGui::PushItemWidth(mInputTextWidth);
-    ImGui::InputText(mInputTextLabel.c_str(), buf, 6);
-    ImGui::PopItemWidth();
-
 }
 
 void    
@@ -493,7 +537,31 @@ CombinatorialOperator::drawName(ImDrawList* dl,ImVec2 window_pos) {
 
   
 
+void     
+CombinatorialOperator::drawInputText(ImDrawList* dl,ImVec2 window_pos){
+    
+    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);
+    ImGui::SetCursorPos (labelPos);
+    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::InputText(mInputTextLabel.c_str(), buf, mTextBufSize);
+    ImGui::PopItemWidth();
 
+}
+void
+CombinatorialOperator::buildOperations()
+{
+    mOperations["XS"] = [](int X, int Y){return X;};
+    mOperations["YS"] = [](int X, int Y){return Y;};
+    mOperations["ADD"] = [](int X, int Y){return X+Y;};
+    mOperations["SUB"] = [](int X, int Y){return X-Y;};
+    mOperations["MUL"] = [](int X, int Y){return X*Y;};
+    mOperations["DIV"] = [](int X, int Y){return X/Y;};
+    mOperations["PLUS1"] = [](int X, int Y){return X+1;};
+
+}
+
+
+ 
 //------------------------- InstructionRegisterWidget ----------------------
 InstructionRegister::InstructionRegister( ) {
 
@@ -525,12 +593,12 @@ InstructionRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos){
     ImVec2 pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 15 ,mPos.y + window_pos.y + mRectPos.y + 55);
     ImGui::SetCursorPos (pos);
     ImGui::PushItemWidth(mInputTextWidth);
-    ImGui::InputText(mInputTextLabel.c_str(), buf, 6,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::InputText(mInputTextLabel.c_str(), buf, mTextBufSize,ImGuiInputTextFlags_CharsDecimal);
     ImGui::PopItemWidth();
     pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 15,mPos.y + window_pos.y + mRectPos.y + 115);
     ImGui::SetCursorPos (pos);
     ImGui::PushItemWidth(mInputTextWidth);
-    ImGui::InputText(mFormaterInputTextLabel.c_str(), buf, 6,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::InputText(mFormaterInputTextLabel.c_str(), buf, mTextBufSize,ImGuiInputTextFlags_CharsDecimal);
     ImGui::PopItemWidth();    
 
 }
@@ -592,9 +660,11 @@ mStart->drawWires(dl,mColor,mThickness,window_pos);
 
 
 ////-----------MUX-------------------
-MUX::MUX(std::string inName,int inInputs):IOBox(inName,0,{0,0}) {
+MUX::MUX(std::string inName,int inInputs,ImVec2 inPos):BasicRegister(inName,0,inPos,1) {
 mWireLen = 20; 
-mColor= IM_COL32(75,50,30,255);
+mPos = inPos;
+mInputTextWidth = 20;
+mColor= gArchiTheme.mMuxColor;
 mRectSize.y=20*(inInputs+1);
 mRectSize.x = 90;
 

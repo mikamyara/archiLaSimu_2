@@ -1,0 +1,268 @@
+#include "MicrocodeTable.h"
+#include <vector>
+#include <string>
+#include "CPU.h"
+#include <iostream>
+#include <regex>
+#include <vector>
+
+MicrocodeTable::MicrocodeTable(CPU* inCPU)
+{
+
+mColNames  = nullptr;
+mSeIMSMenu =nullptr; 
+mCPU = inCPU;
+mCols=0; mRows=0;
+
+}
+
+void
+MicrocodeTable::Rebuild() {
+
+mRows=501;
+//## Step A : check column names
+std::vector<std::string> theColsList;
+// build a list of all signals to consider in the MicrocodeTable
+theColsList.push_back("uCode");
+theColsList.push_back("suiv.");
+int k;
+for(k=0;k<mCPU->mSequencer->mMuxesNames.size();k++) {
+    theColsList.push_back(mCPU->mSequencer->mMuxesNames[k]);
+    }
+
+for(k=0;k<mCPU->mArchiCircuit->mB1signals.size();k++) {
+    theColsList.push_back(mCPU->mArchiCircuit->mB1signals[k]);
+    }
+for(k=0;k<mCPU->mArchiCircuit->mB2signals.size();k++) {
+    theColsList.push_back(mCPU->mArchiCircuit->mB2signals[k]);
+    }    
+for(k=0;k<mCPU->mArchiCircuit->mOtherSignals.size();k++) {
+    theColsList.push_back(mCPU->mArchiCircuit->mOtherSignals[k]);
+    }        
+
+    
+std::map<std::string, CombinatorialOperator::FunctionPtr>& ops = mCPU->mArchiCircuit->OP->mOperations;    
+for(std::map<std::string, CombinatorialOperator::FunctionPtr>::iterator it = ops.begin(); it != ops.end(); ++it) {
+    theColsList.push_back(it->first);
+    }
+
+for(k=0;k<mCPU->mArchiCircuit->mB3signals.size();k++) {
+    theColsList.push_back(mCPU->mArchiCircuit->mB3signals[k]);
+    }        
+
+// then convert it in more standard C structure in order to give it to imGui
+ mColNames = new char*[theColsList.size()];
+ for(k=0;k<theColsList.size();k++) {
+    mColNames[k] = new char[theColsList[k].size() +1 ];
+    strcpy(mColNames[k],theColsList[k].c_str());
+    }
+
+mCols = theColsList.size();
+
+// build Map
+for(k=0;k<theColsList.size();k++) {
+    sigToCol[toUpper(theColsList[k])]=k;
+    }
+
+//## Step B : build next address column (data)
+mAdrSuiv.resize(mRows);
+for(int l=0;l<mRows ; l++) 
+    { mAdrSuiv[l] = new char[4];
+    strcpy(mAdrSuiv[l],"000");        
+    }
+
+//## Step C : build SeIMS column (data)
+mSeIMS.resize(mRows);
+for(int l=0;l<mSeIMS.size();l++) {mSeIMS[l]=0;}
+//## Step D : build array for all other bools
+mSignals = new bool*[mRows];
+for(int l=0;l<mRows;l++) {
+    mSignals[l] = new bool[mCols];
+    for(int m=3;m<mCols;m++) {
+        mSignals[l][m] = false;
+        }
+    }
+
+
+
+
+//## Step D : build SeIMS menu
+mSeIMSMenu = new char*[4];
+for(int l=0;l<4 ; l++) 
+    { mSeIMSMenu[l] = new char[2];
+    char str[]="0";
+    str[0]+=l;
+    strcpy(mSeIMSMenu[l],str);        
+    }
+
+insertByExpression("498:000:0:0:0: COB1 XS eRAM");
+insertByExpression("499:000:0:0:0: sM");
+insertByExpression("500:000:2:0:0: REB1 XS eRI");
+
+}
+
+
+
+
+void    
+MicrocodeTable::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
+ 
+
+    static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable  | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn; // ImGuiTableFlags_Resizable
+    static ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+
+    static int frozen_cols = 1;
+    static int frozen_rows = 2;
+
+    ImGui::SetCursorPos (window_pos);
+    if (ImGui::BeginTable("table_angled_headers", mCols, table_flags, ImVec2(550, 300)))
+    {
+        //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
+        for (int n = 0; n < mCols; n++)
+            ImGui::TableSetupColumn(mColNames[n], column_flags);
+        ImGui::TableSetupScrollFreeze(frozen_cols, frozen_rows);
+
+        ImGui::TableAngledHeadersRow(); // Draw angled headers for all columns with the ImGuiTableColumnFlags_AngledHeader flag.
+        ImGui::TableHeadersRow();       // Draw remaining headers and allow access to context-menu and other functions.
+        for (int row = 0; row < mRows; row++)
+        {
+            ImGui::PushID(row);
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::AlignTextToFramePadding();
+            ImGui::Text("%03d", row);
+            for (int column = 1; column < mCols; column++)
+                if (ImGui::TableSetColumnIndex(column))
+                {
+                    ImGui::PushID(column);
+                    if(column == 1) {
+                        ImGui::PushItemWidth(11*3);
+                        ImGui::InputText("",mAdrSuiv[row], 4, ImGuiInputTextFlags_CharsDecimal);   
+                        ImGui::PopItemWidth();                       
+                    }else if(column==2) {
+                        ImGui::PushItemWidth(50);
+                        ImGui::Combo("", &mSeIMS[row], mSeIMSMenu,4);
+                        ImGui::PopItemWidth();                       
+
+                        }
+                    else {
+                    ImGui::Checkbox("", &( mSignals[row][column]));
+                    }
+                    ImGui::PopID();
+                }
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+
+}
+
+
+
+bool    
+MicrocodeTable::insertByExpression(std::string expr){
+
+    int code, suiv, SeIMS;
+    bool Cond, Fin;
+    std::vector < std::string > orders;
+
+    bool ret = matchMicrocodeExpression(expr,code,suiv,SeIMS,Cond,Fin,orders);
+    if(ret==false || code>500 || suiv>500 || SeIMS>3) return false;
+
+    for(int k=0;k<orders.size();k++) {
+        if(sigToCol.find(toUpper(orders[k])) == sigToCol.end()) {
+            return false;
+        }         
+    }    
+
+    sprintf(mAdrSuiv[code],"%03d",suiv);
+    mSeIMS[code] = SeIMS;
+
+    mSignals[code][sigToCol[toUpper("Cond")]]= Cond;
+    mSignals[code][sigToCol[toUpper("Fin")]]= Fin;
+
+    for(int k=0;k<orders.size();k++) {
+        mSignals[code][sigToCol[toUpper(orders[k])]]= true;
+    }    
+
+    return true;
+
+}
+
+
+ 
+
+
+
+bool 
+MicrocodeTable::matchMicrocodeExpression (std::string s,
+                               int &code, int &suiv, int &SeIMS,
+                               bool &Cond, bool &Fin,
+                               std::vector < std::string > &orders)
+{
+    std::vector < std::string > r;
+
+    if (matchCommand (s, r))
+    {
+        code = std::stoi (r[0]); 
+        suiv = std::stoi (r[1]);
+        SeIMS = std::stoi (r[2]);
+        Cond = std::stoi (r[3]) == 1 ? true : false;
+        Fin = std::stoi (r[4]) == 1 ? true : false;
+        matchSignals (r[5], orders);
+        return true;
+    }
+    return false;
+}
+
+
+bool 
+MicrocodeTable::matchCommand (std::string s, std::vector < std::string > &v)
+{
+    std::
+    regex
+    rgx
+    ("^\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]?\\s*(.*)\\s*");
+    std::smatch match;
+
+    if (std::regex_search (s.cbegin (), s.cend (), match, rgx))
+    {
+        for (int k = 1; k <= 6; k++)
+        {
+            v.push_back (match[k]);
+        }
+        return true;
+    }
+    return false;
+}
+
+bool 
+MicrocodeTable::matchSignals (const std::string input,
+                   std::vector < std::string > &result)
+{
+    std::regex rgx ("\\b\\w+\\b");
+
+    std::sregex_iterator iter (input.begin (), input.end (), rgx);
+    std::sregex_iterator end;
+
+    while (iter != end)
+    {
+        result.push_back (iter->str ());
+        ++iter;
+    }
+    return !result.empty ();
+}
+
+std::string 
+MicrocodeTable::toUpper(std::string str) {
+
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+        return std::toupper(c);
+    });
+    return str;
+}
+
+
+
+
+

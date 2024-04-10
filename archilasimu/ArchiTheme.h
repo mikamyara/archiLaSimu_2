@@ -10,7 +10,7 @@
 class ArchiTheme {
 public:
     ArchiTheme() ;
-    ImU32 mBus1Color,mBus2Color,mBus3Color,mBoxWireColor,mRegisterOutputCircleColor;
+    ImU32 mBus1Color,mBus2Color,mBus3Color,mBoxWireColor,mRegisterOutputCircleColor,mMuxColor;
     ImU32 mSelectedColor,mErrorColor;
     float mBusThickness;
     

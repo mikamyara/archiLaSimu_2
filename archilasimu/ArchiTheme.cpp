@@ -14,6 +14,7 @@ mBoxWireColor  = IM_COL32(255,255,255,255);
 mSelectedColor = IM_COL32(00,200,255,255);
 mErrorColor    = IM_COL32(188,133,0,255);
 mRegisterOutputCircleColor =  IM_COL32(00,80,140,255);
+mMuxColor = IM_COL32(75,50,30,255);
 
 mBusThickness  = 4.0f;
 
@@ -37,7 +38,7 @@ ArchiTheme::LoadFonts( ImGuiIO *in_io) {
 void addAlignedText(ImDrawList* dl,ImVec2 pos,eHTextAlign align,  std::string str,ImU32 inColor,ImFont* font,float font_size){
     if(align==eTextCenter) {
         ImVec2 textSize = ImGui::CalcTextSize(str.c_str());
-        pos.x = pos.x - textSize.x/2;
+        pos.x = pos.x - textSize.x/2 - (font_size-2)/10  ;
     }
     if(align==eTextRight) {
         ImVec2 textSize = ImGui::CalcTextSize(str.c_str());

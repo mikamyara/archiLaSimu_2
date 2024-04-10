@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 #include <imgui.h>
+#include <stdio.h>
+#include <map>
 
 
 enum eSignalStatus { normal,selected,error};
@@ -63,7 +65,8 @@ class IOBox {
 
         // drawing related methods
         virtual  void    RebuildLocalCoords();
-        virtual  void    draw(ImDrawList* dl, ImVec2 window_pos);
+        virtual void     drawWidgets(ImDrawList* dl, ImVec2 pos);        
+        virtual  void    draw(ImDrawList* dl, ImVec2 window_pos);        
         virtual  void    drawBox(ImDrawList* dl,ImVec2 window_pos);    
        // void    drawName(ImDrawList* dl,ImVec2 window_pos);            
         virtual  void    drawNode(ImDrawList* dl,ImVec2 window_pos,const IOBoxNodes& theNodes,int num,ImU32 inBusColor);
@@ -82,9 +85,31 @@ class IOBox {
         ImVec2 mBoundingRectSize;
         ImVec2 mPos;
 };
+
+////-------------BasicRegister-----------------
+class BasicRegister:public IOBox{
+    public:
+        BasicRegister();
+        BasicRegister(std::string inName,ImU32 inColor,ImVec2 inPos,int textBufSize);
+        virtual void draw(ImDrawList* dl, ImVec2 window_pos);
+        virtual void drawWidgets(ImDrawList* dl, ImVec2 pos);        
+        virtual void drawInputText(ImDrawList* dl,ImVec2 window_pos);
+        virtual int  getValue() ;
+        virtual int  filterValue(int val) const;
+        virtual int  setValue(int val) ;
+
+        char* buf;
+        int minValue,maxValue;
+        int mTextBufSize;
+        std::string mInputTextLabel;
+        int mInputTextWidth;
+
+
+};
+
 ////---------------RegisterBus123----------------
 
-class RegisterBus123:public IOBox{
+class RegisterBus123:public BasicRegister{
     public:
     RegisterBus123();
     RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos);
@@ -93,21 +118,16 @@ class RegisterBus123:public IOBox{
     virtual void drawLabels(ImDrawList* dl,ImVec2 window_pos);
     virtual  void    drawInputNodes(ImDrawList* dl,ImVec2 window_pos);
     virtual  void    drawOutputNodes(ImDrawList* dl,ImVec2 window_pos);    
-    virtual void     drawInputText(ImDrawList* dl,ImVec2 window_pos);
 
 
     // general data
-    int mValue;
-    char buf[6];
-    std::string mInputTextLabel,mFormaterInputTextLabel;
+
     Node *mBus1Node,*mBus2Node,*mBus3Node;
-    int mInputTextWidth;
 
 };
 
 
 ////----------------CombinatorialOperator-----------------------
-
 
 class CombinatorialOperator:public RegisterBus123 {
     public:
@@ -116,7 +136,11 @@ class CombinatorialOperator:public RegisterBus123 {
         
         virtual void draw(ImDrawList* dl, ImVec2 window_pos);
         virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
-   
+        virtual void drawInputText(ImDrawList* dl,ImVec2 window_pos);
+        typedef int (*FunctionPtr)(int, int);
+        void    buildOperations();
+        std::map<std::string, FunctionPtr>  mOperations;
+
 };
 ////----------------CombinatorialOperator-----------------------
 
@@ -128,6 +152,7 @@ class InstructionRegister:public RegisterBus123 {
    // virtual void draw(ImDrawList* dl, ImVec2 window_pos);
     virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
     virtual void drawInputText(ImDrawList* dl,ImVec2 window_pos);
+    std::string mFormaterInputTextLabel;
 
 };
 
@@ -148,9 +173,9 @@ class Bus {
     float mThickness;
 };
 ////----------------MUX--------------------
-class MUX:public IOBox {
+class MUX:public BasicRegister {
     public:
-    MUX(std::string inName="",int inInputs=0);
+    MUX(std::string inName="",int inInputs=0,ImVec2 inPos={0,0});
     int mCurrentValue;
 
 };
