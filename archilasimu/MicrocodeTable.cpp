@@ -9,13 +9,13 @@
 MicrocodeTable::MicrocodeTable (CPU * inCPU)
 {
 
-  mColNames = nullptr;
-  mSeIMSMenu = nullptr;
-  mShortViewStrings = nullptr;
-  mShortViewCols = 0;
-  mCPU = inCPU;
-  mCols = 0;
-  mRows = 0;
+    mColNames = nullptr;
+    mSeIMSMenu = nullptr;
+    mShortViewStrings = nullptr;
+    mShortViewCols = 0;
+    mCPU = inCPU;
+    mCols = 0;
+    mRows = 0;
 
 }
 
@@ -23,121 +23,137 @@ void
 MicrocodeTable::Rebuild ()
 {
 
-  mRows = 501;
+    mRows = 501;
 //## Step A : check column names
-  std::vector < std::string > theColsList;
+    std::vector < std::string > theColsList;
 // build a list of all signals to consider in the MicrocodeTable
-  theColsList.push_back ("uCode");
-  theColsList.push_back ("suiv.");
-  int k;
-  for (k = 0; k < mCPU->mSequencer->mMuxesNames.size (); k++)
+    theColsList.push_back ("uCode");
+    theColsList.push_back ("suiv.");
+    int k;
+    for (k = 0; k < mCPU->mSequencer->mMuxesNames.size (); k++)
     {
-      theColsList.push_back (mCPU->mSequencer->mMuxesNames[k]);
+        theColsList.push_back (mCPU->mSequencer->mMuxesNames[k]);
     }
 
-  for (k = 0; k < mCPU->mArchiCircuit->mB1signals.size (); k++)
+    for (k = 0; k < mCPU->mArchiCircuit->mB1signals.size (); k++)
     {
-      theColsList.push_back (mCPU->mArchiCircuit->mB1signals[k]);
+        theColsList.push_back (mCPU->mArchiCircuit->mB1signals[k]);
     }
-  for (k = 0; k < mCPU->mArchiCircuit->mB2signals.size (); k++)
+    for (k = 0; k < mCPU->mArchiCircuit->mB2signals.size (); k++)
     {
-      theColsList.push_back (mCPU->mArchiCircuit->mB2signals[k]);
+        theColsList.push_back (mCPU->mArchiCircuit->mB2signals[k]);
     }
-  for (k = 0; k < mCPU->mArchiCircuit->mOtherSignals.size (); k++)
+    for (k = 0; k < mCPU->mArchiCircuit->mOtherSignals.size (); k++)
     {
-      theColsList.push_back (mCPU->mArchiCircuit->mOtherSignals[k]);
-    }
-
-
-  std::map < std::string, CombinatorialOperator::FunctionPtr > &ops =
-    mCPU->mArchiCircuit->OP->mOperations;
-  for (std::map < std::string,
-       CombinatorialOperator::FunctionPtr >::iterator it = ops.begin ();
-       it != ops.end (); ++it)
-    {
-      theColsList.push_back (it->first);
+        theColsList.push_back (mCPU->mArchiCircuit->mOtherSignals[k]);
     }
 
-  for (k = 0; k < mCPU->mArchiCircuit->mB3signals.size (); k++)
+
+    std::map < std::string, CombinatorialOperator::FunctionPtr > &ops =
+        mCPU->mArchiCircuit->OP->mOperations;
+    for (std::map < std::string,
+            CombinatorialOperator::FunctionPtr >::iterator it = ops.begin ();
+            it != ops.end (); ++it)
     {
-      theColsList.push_back (mCPU->mArchiCircuit->mB3signals[k]);
+        theColsList.push_back (it->first);
+    }
+
+    for (k = 0; k < mCPU->mArchiCircuit->mB3signals.size (); k++)
+    {
+        theColsList.push_back (mCPU->mArchiCircuit->mB3signals[k]);
     }
 
 // then convert it in more standard C structure in order to give it to imGui
-  mColNames = new char *[theColsList.size ()];
-  for (k = 0; k < theColsList.size (); k++)
+    mColNames = new char *[theColsList.size ()];
+    for (k = 0; k < theColsList.size (); k++)
     {
-      mColNames[k] = new char[theColsList[k].size () + 1];
-      strcpy (mColNames[k], theColsList[k].c_str ());
+        mColNames[k] = new char[theColsList[k].size () + 1];
+        strcpy (mColNames[k], theColsList[k].c_str ());
     }
 
-  mCols = theColsList.size ();
+    mCols = theColsList.size ();
 
 // build Map
-  for (k = 0; k < theColsList.size (); k++)
+    for (k = 0; k < theColsList.size (); k++)
     {
-      sigToCol[toUpper (theColsList[k])] = k;
+        sigToCol[toUpper (theColsList[k])] = k;
     }
 
 //## Step B : build next address column (data)
-  mAdrSuiv.resize (mRows);
-  for (int l = 0; l < mRows; l++)
+    mAdrSuiv.resize (mRows);
+    for (int l = 0; l < mRows; l++)
     {
-      mAdrSuiv[l] = new char[4];
-      strcpy (mAdrSuiv[l], "000");
+        mAdrSuiv[l] = new char[4];
+        strcpy (mAdrSuiv[l], "000");
     }
 
-//## Step C : build SeIMS column (data)
-  mSeIMS.resize (mRows);
-  for (int l = 0; l < mSeIMS.size (); l++)
+//## Step C : build SeIMS and Cond columns (data)
+    mSeIMS.resize (mRows);
+    for (int l = 0; l < mSeIMS.size (); l++)
     {
-      mSeIMS[l] = 0;
+        mSeIMS[l] = 0;
     }
+    mCond.resize (mRows);
+    for (int l = 0; l < mCond.size (); l++)
+    {
+        mCond[l] = 0;
+    }
+  
 //## Step D : build array for all other bools
-  mSignals = new bool *[mRows];
-  for (int l = 0; l < mRows; l++)
+    mSignals = new bool *[mRows];
+    for (int l = 0; l < mRows; l++)
     {
-      mSignals[l] = new bool[mCols];
-      for (int m = 3; m < mCols; m++)
-	{
-	  mSignals[l][m] = false;
-	}
+        mSignals[l] = new bool[mCols];
+        for (int m = 4; m < mCols; m++)
+        {
+            mSignals[l][m] = false;
+        }
     }
 
 
 
 
-//## Step D : build SeIMS menu
-  mSeIMSMenu = new char *[4];
-  for (int l = 0; l < 4; l++)
+//## Step D : build SeIMS & Cond menus
+    mSeIMSMenu = new char *[4];
+    for (int l = 0; l < 4; l++)
     {
-      mSeIMSMenu[l] = new char[2];
-      char str[] = "0";
-      str[0] += l;
-      strcpy (mSeIMSMenu[l], str);
+        mSeIMSMenu[l] = new char[2];
+        char str[] = "0";
+        str[0] += l;
+        strcpy (mSeIMSMenu[l], str);
+    }
+    mCondMenu = new char *[7];
+    for (int l = 0; l < 7; l++)
+    {
+        mCondMenu[l] = new char[2];
+        char str[] = "0";
+        str[0] += l;
+        strcpy (mCondMenu[l], str);
     }
 
-  insertByExpression ("498:000:0:0:0: COB1 XS eRAM");
-  insertByExpression ("499:000:0:0:0: sM");
-  insertByExpression ("500:000:2:0:0: REB1 XS eRI");
+
+// add fetch
+    insertByExpression ("498:000:0:0:0: COB1 XS eRAM");
+    insertByExpression ("499:000:0:0:0: sM");
+    insertByExpression ("500:000:2:0:0: REB1 XS eRI");
 
 
 // ### short view management
-  mShortViewColNames = new char *[mRows];
-  mShortViewStrings = new char *[mRows];
-  for (k = 0; k < mRows; k++)
+    mShortViewColNames = new char *[mRows];
+    mShortViewStrings = new char *[mRows];
+    for (k = 0; k < mRows; k++)
     {
-      mShortViewColNames[k] = new char[30];
-      mShortViewStrings[k] = new char[100];
-      mShortViewColNames[k][0]=0;
-      mShortViewStrings[k][0]=0;
+        mShortViewColNames[k] = new char[30];
+        mShortViewStrings[k] = new char[100];
+        mShortViewColNames[k][0] = 0;
+        mShortViewStrings[k][0] = 0;
     }
-  mShortViewCols = 6;
-  for (k = 0; k < 5; k++)
+    mShortViewCols = 6;
+    for (k = 0; k < 5; k++)
     {
-      strcpy (mShortViewColNames[k], theColsList[k].c_str ());
+        strcpy (mShortViewColNames[k], theColsList[k].c_str ());
     }
-  strcpy (mShortViewColNames[5], "Ordres");
+    strcpy (mShortViewColNames[5], "Ordres");
 
 
 
@@ -150,44 +166,44 @@ void
 MicrocodeTable::drawWidgets (ImDrawList * dl, ImVec2 window_pos)
 {
 
-  ImGui::SetCursorPos (window_pos);
+    ImGui::SetCursorPos (window_pos);
 
-  // ImGui::PushStyleVar(ImGuiStyleVar_ChildBorderSize, 0); // Ajustez la taille de la bordure ici
+    ImGui::PushStyleVar (ImGuiStyleVar_ChildBorderSize, 0);	// Ajustez la taille de la bordure ici
 
 
-  ImGui::BeginChild ("Mon enfant", ImVec2 (560, 325), true);
-  //ImGui::PopStyleVar();
+    ImGui::BeginChild ("Mon enfant", ImVec2 (560, 325), true);
+    ImGui::PopStyleVar ();
 
-  // Crée un onglet (tab) dans l'enfant
-  if (ImGui::BeginTabBar ("Mon onglet"))
+    // Crée un onglet (tab) dans l'enfant
+    if (ImGui::BeginTabBar ("Mon onglet"))
 
-    if (ImGui::BeginTabItem ("Vue principale"))
-      {
-	// Contenu de l'onglet 1
-	//ImGui::Text("Contenu de l'onglet 1");
-	ImVec2 thePos = window_pos;
-	thePos.y += 10;
-	MainMicrocodeTableWidget (dl, thePos);
+        if (ImGui::BeginTabItem ("Vue principale"))
+        {
+            // Contenu de l'onglet 1
+            //ImGui::Text("Contenu de l'onglet 1");
+            ImVec2 thePos = window_pos;
+            thePos.y += 10;
+            MainMicrocodeTableWidget (dl, thePos);
 
-	ImGui::EndTabItem ();
-      }
-  {
+            ImGui::EndTabItem ();
+        }
+    {
 
-    if (ImGui::BeginTabItem ("Vue résumée"))
-      {
-	ImVec2 thePos = window_pos;
-	thePos.y += 10;
-	// Contenu de l'onglet 2
-	ShortMicroCodeTableWidget (dl, thePos);
-	ImGui::EndTabItem ();
-      }
+        if (ImGui::BeginTabItem ("Vue synthétisée"))
+        {
+            ImVec2 thePos = window_pos;
+            thePos.y += 10;
+            // Contenu de l'onglet 2
+            ShortMicroCodeTableWidget (dl, thePos);
+            ImGui::EndTabItem ();
+        }
 
-    ImGui::EndTabBar ();
-  }
+        ImGui::EndTabBar ();
+    }
 
-  ImGui::EndChild ();
+    ImGui::EndChild ();
 
-  // MainMicrocodeTableWidget(dl,window_pos); 
+    // MainMicrocodeTableWidget(dl,window_pos);
 
 
 
@@ -199,61 +215,66 @@ void
 MicrocodeTable::ShortMicroCodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 {
 
-  static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;	// ImGuiTableFlags_Resizable
-  static ImGuiTableColumnFlags column_flags =
-    ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+    static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;	// ImGuiTableFlags_Resizable
+    static ImGuiTableColumnFlags column_flags =
+        ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
 
-  static int frozen_cols = 1;
-  static int frozen_rows = 2;
-  if (ImGui::BeginTable ("table_angled_headers", mShortViewCols, table_flags,
-			 ImVec2 (550, 275)))
+    static int frozen_cols = 1;
+    static int frozen_rows = 2;
+    if (ImGui::BeginTable ("table_angled_headers", mShortViewCols, table_flags,
+                           ImVec2 (550, 275)))
     {
-      //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
-      for (int n = 0; n < mShortViewCols; n++)
-	ImGui::TableSetupColumn (mColNames[n], column_flags);
-      ImGui::TableSetupScrollFreeze (frozen_cols, frozen_rows);
+        //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
+        for (int n = 0; n < mShortViewCols; n++)
+            ImGui::TableSetupColumn (mShortViewColNames[n], column_flags);
+        ImGui::TableSetupScrollFreeze (frozen_cols, frozen_rows);
 
-      ImGui::TableAngledHeadersRow ();	// Draw angled headers for all columns with the ImGuiTableColumnFlags_AngledHeader flag.
-      ImGui::TableHeadersRow ();	// Draw remaining headers and allow access to context-menu and other functions.
-      for (int row = 0; row < mRows; row++)
-	{
-	  ImGui::PushID (row);
-	  ImGui::TableNextRow ();
-	  ImGui::TableSetColumnIndex (0);
-	  ImGui::AlignTextToFramePadding ();
-	  ImGui::Text ("%03d", row);
-	  for (int column = 1; column < mShortViewCols; column++)
-	    if (ImGui::TableSetColumnIndex (column))
-	      {
-		ImGui::PushID (column);
-		if (column == 1)
-		  {
-		    ImGui::PushItemWidth (11 * 3);
-		    ImGui::InputText ("", mAdrSuiv[row], 4,
-				      ImGuiInputTextFlags_CharsDecimal);
-		    ImGui::PopItemWidth ();
-		  }
-		else if (column == 2)
-		  {
-		    ImGui::PushItemWidth (50);
-		    ImGui::Combo ("", &mSeIMS[row], mSeIMSMenu, 4);
-		    ImGui::PopItemWidth ();
-		  }
-		else if (column == 5)
-		  {
-		    ImGui::PushItemWidth (300);
-		    ImGui::InputText ("", mShortViewStrings[row], 100);
-		    ImGui::PopItemWidth ();
-		  }
-		else
-		  {
-		    ImGui::Checkbox ("", &(mSignals[row][column]));
-		  }
-		ImGui::PopID ();
-	      }
-	  ImGui::PopID ();
-	}
-      ImGui::EndTable ();
+        ImGui::TableAngledHeadersRow ();	// Draw angled headers for all columns with the ImGuiTableColumnFlags_AngledHeader flag.
+        ImGui::TableHeadersRow ();	// Draw remaining headers and allow access to context-menu and other functions.
+        for (int row = 0; row < mRows; row++)
+        {
+            ImGui::PushID (row);
+            ImGui::TableNextRow ();
+            ImGui::TableSetColumnIndex (0);
+            ImGui::AlignTextToFramePadding ();
+            ImGui::Text ("%03d", row);
+            for (int column = 1; column < mShortViewCols; column++)
+                if (ImGui::TableSetColumnIndex (column))
+                {
+                    ImGui::PushID (column);
+                    if (column == 1)
+                    {
+                        ImGui::PushItemWidth (11 * 3);
+                        ImGui::InputText ("", mAdrSuiv[row], 4,
+                                          ImGuiInputTextFlags_CharsDecimal);
+                        ImGui::PopItemWidth ();
+                    }
+                    else if (column == 2)
+                    {
+                        ImGui::PushItemWidth (50);
+                        ImGui::Combo ("", &mSeIMS[row], mSeIMSMenu, 4);
+                        ImGui::PopItemWidth ();
+                    }
+                    else if(column == 3) {
+                        ImGui::PushItemWidth (50);
+                        ImGui::Combo ("", &mCond[row], mCondMenu, 7);
+                        ImGui::PopItemWidth ();
+                    }
+                    else if (column == 5)
+                    {
+                        ImGui::PushItemWidth (300);
+                        ImGui::InputText ("", mShortViewStrings[row], 100);
+                        ImGui::PopItemWidth ();
+                    }
+                    else
+                    {
+                        ImGui::Checkbox ("", &(mSignals[row][column]));
+                    }
+                    ImGui::PopID ();
+                }
+            ImGui::PopID ();
+        }
+        ImGui::EndTable ();
     }
 
 
@@ -264,56 +285,61 @@ MicrocodeTable::MainMicrocodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 {
 
 
-  static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;	// ImGuiTableFlags_Resizable
-  static ImGuiTableColumnFlags column_flags =
-    ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
+    static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;	// ImGuiTableFlags_Resizable
+    static ImGuiTableColumnFlags column_flags =
+        ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
 
-  static int frozen_cols = 1;
-  static int frozen_rows = 2;
-  if (ImGui::BeginTable ("table_angled_headers", mCols, table_flags,
-			 ImVec2 (550, 275)))
+    static int frozen_cols = 1;
+    static int frozen_rows = 2;
+    if (ImGui::BeginTable ("table_angled_headers", mCols, table_flags,
+                           ImVec2 (550, 275)))
     {
-      //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
-      for (int n = 0; n < mCols; n++)
-	ImGui::TableSetupColumn (mColNames[n], column_flags);
-      ImGui::TableSetupScrollFreeze (frozen_cols, frozen_rows);
+        //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
+        for (int n = 0; n < mCols; n++)
+            ImGui::TableSetupColumn (mColNames[n], column_flags);
+        ImGui::TableSetupScrollFreeze (frozen_cols, frozen_rows);
 
-      ImGui::TableAngledHeadersRow ();	// Draw angled headers for all columns with the ImGuiTableColumnFlags_AngledHeader flag.
-      ImGui::TableHeadersRow ();	// Draw remaining headers and allow access to context-menu and other functions.
-      for (int row = 0; row < mRows; row++)
-	{
-	  ImGui::PushID (row);
-	  ImGui::TableNextRow ();
-	  ImGui::TableSetColumnIndex (0);
-	  ImGui::AlignTextToFramePadding ();
-	  ImGui::Text ("%03d", row);
-	  for (int column = 1; column < mCols; column++)
-	    if (ImGui::TableSetColumnIndex (column))
-	      {
-		ImGui::PushID (column);
-		if (column == 1)
-		  {
-		    ImGui::PushItemWidth (11 * 3);
-		    ImGui::InputText ("", mAdrSuiv[row], 4,
-				      ImGuiInputTextFlags_CharsDecimal);
-		    ImGui::PopItemWidth ();
-		  }
-		else if (column == 2)
-		  {
-		    ImGui::PushItemWidth (50);
-		    ImGui::Combo ("", &mSeIMS[row], mSeIMSMenu, 4);
-		    ImGui::PopItemWidth ();
+        ImGui::TableAngledHeadersRow ();	// Draw angled headers for all columns with the ImGuiTableColumnFlags_AngledHeader flag.
+        ImGui::TableHeadersRow ();	// Draw remaining headers and allow access to context-menu and other functions.
+        for (int row = 0; row < mRows; row++)
+        {
+            ImGui::PushID (row);
+            ImGui::TableNextRow ();
+            ImGui::TableSetColumnIndex (0);
+            ImGui::AlignTextToFramePadding ();
+            ImGui::Text ("%03d", row);
+            for (int column = 1; column < mCols; column++)
+                if (ImGui::TableSetColumnIndex (column))
+                {
+                    ImGui::PushID (column);
+                    if (column == 1)
+                    {
+                        ImGui::PushItemWidth (11 * 3);
+                        ImGui::InputText ("", mAdrSuiv[row], 4,
+                                          ImGuiInputTextFlags_CharsDecimal);
+                        ImGui::PopItemWidth ();
+                    }
+                    else if (column == 2)
+                    {
+                        ImGui::PushItemWidth (50);
+                        ImGui::Combo ("", &mSeIMS[row], mSeIMSMenu, 4);
+                        ImGui::PopItemWidth ();
 
-		  }
-		else
-		  {
-		    ImGui::Checkbox ("", &(mSignals[row][column]));
-		  }
-		ImGui::PopID ();
-	      }
-	  ImGui::PopID ();
-	}
-      ImGui::EndTable ();
+                    }
+                    else if(column == 3) {
+                        ImGui::PushItemWidth (50);
+                        ImGui::Combo ("", &mCond[row], mCondMenu, 7);
+                        ImGui::PopItemWidth ();
+                    }
+                    else
+                    {
+                        ImGui::Checkbox ("", &(mSignals[row][column]));
+                    }
+                    ImGui::PopID ();
+                }
+            ImGui::PopID ();
+        }
+        ImGui::EndTable ();
     }
 
 }
@@ -331,35 +357,34 @@ bool
 MicrocodeTable::insertByExpression (std::string expr)
 {
 
-  int code, suiv, SeIMS;
-  bool Cond, Fin;
-  std::vector < std::string > orders;
+    int code, suiv, SeIMS,Cond;
+    bool Fin;
+    std::vector < std::string > orders;
 
-  bool ret =
-    matchMicrocodeExpression (expr, code, suiv, SeIMS, Cond, Fin, orders);
-  if (ret == false || code > 500 || suiv > 500 || SeIMS > 3)
-    return false;
+    bool ret =
+        matchMicrocodeExpression (expr, code, suiv, SeIMS, Cond, Fin, orders);
+    if (ret == false || code > 500 || suiv > 500 || SeIMS > 3 || Cond >7)
+        return false;
 
-  for (int k = 0; k < orders.size (); k++)
+    for (int k = 0; k < orders.size (); k++)
     {
-      if (sigToCol.find (toUpper (orders[k])) == sigToCol.end ())
-	{
-	  return false;
-	}
+        if (sigToCol.find (toUpper (orders[k])) == sigToCol.end ())
+        {
+            return false;
+        }
     }
 
-  sprintf (mAdrSuiv[code], "%03d", suiv);
-  mSeIMS[code] = SeIMS;
+    sprintf (mAdrSuiv[code], "%03d", suiv);
+    mSeIMS[code] = SeIMS;
+    mCond[code] = Cond;
+    mSignals[code][sigToCol[toUpper ("Fin")]] = Fin;
 
-  mSignals[code][sigToCol[toUpper ("Cond")]] = Cond;
-  mSignals[code][sigToCol[toUpper ("Fin")]] = Fin;
-
-  for (int k = 0; k < orders.size (); k++)
+    for (int k = 0; k < orders.size (); k++)
     {
-      mSignals[code][sigToCol[toUpper (orders[k])]] = true;
+        mSignals[code][sigToCol[toUpper (orders[k])]] = true;
     }
 
-  return true;
+    return true;
 
 }
 
@@ -370,69 +395,69 @@ MicrocodeTable::insertByExpression (std::string expr)
 
 bool
 MicrocodeTable::matchMicrocodeExpression (std::string s,
-					  int &code, int &suiv, int &SeIMS,
-					  bool &Cond, bool &Fin,
-					  std::vector < std::string > &orders)
+        int &code, int &suiv, int &SeIMS,
+        int &Cond, bool &Fin,
+        std::vector < std::string > &orders)
 {
-  std::vector < std::string > r;
+    std::vector < std::string > r;
 
-  if (matchCommand (s, r))
+    if (matchCommand (s, r))
     {
-      code = std::stoi (r[0]);
-      suiv = std::stoi (r[1]);
-      SeIMS = std::stoi (r[2]);
-      Cond = std::stoi (r[3]) == 1 ? true : false;
-      Fin = std::stoi (r[4]) == 1 ? true : false;
-      matchSignals (r[5], orders);
-      return true;
+        code = std::stoi (r[0]);
+        suiv = std::stoi (r[1]);
+        SeIMS = std::stoi (r[2]);
+        Cond = std::stoi (r[3]) ;
+        Fin = std::stoi (r[4]) == 1 ? true : false;
+        matchSignals (r[5], orders);
+        return true;
     }
-  return false;
+    return false;
 }
 
 
 bool
 MicrocodeTable::matchCommand (std::string s, std::vector < std::string > &v)
 {
-  std::regex
+    std::regex
     rgx
     ("^\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]+)\\s*[:/\\|]?\\s*(.*)\\s*");
-  std::smatch match;
+    std::smatch match;
 
-  if (std::regex_search (s.cbegin (), s.cend (), match, rgx))
+    if (std::regex_search (s.cbegin (), s.cend (), match, rgx))
     {
-      for (int k = 1; k <= 6; k++)
-	{
-	  v.push_back (match[k]);
-	}
-      return true;
+        for (int k = 1; k <= 6; k++)
+        {
+            v.push_back (match[k]);
+        }
+        return true;
     }
-  return false;
+    return false;
 }
 
 bool
 MicrocodeTable::matchSignals (const std::string input,
-			      std::vector < std::string > &result)
+                              std::vector < std::string > &result)
 {
-  std::regex rgx ("\\b\\w+\\b");
+    std::regex rgx ("\\b\\w+\\b");
 
-  std::sregex_iterator iter (input.begin (), input.end (), rgx);
-  std::sregex_iterator end;
+    std::sregex_iterator iter (input.begin (), input.end (), rgx);
+    std::sregex_iterator end;
 
-  while (iter != end)
+    while (iter != end)
     {
-      result.push_back (iter->str ());
-      ++iter;
+        result.push_back (iter->str ());
+        ++iter;
     }
-  return !result.empty ();
+    return !result.empty ();
 }
 
 std::string MicrocodeTable::toUpper (std::string str)
 {
 
-  std::transform (str.begin (), str.end (), str.begin (),[](unsigned char c)
-		  {
-		  return std::toupper (c);
-		  }
-  );
-  return str;
+    std::transform (str.begin (), str.end (), str.begin (),[](unsigned char c)
+    {
+        return std::toupper (c);
+    }
+                   );
+    return str;
 }

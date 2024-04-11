@@ -10,7 +10,7 @@
 class ArchiTheme {
 public:
     ArchiTheme() ;
-    ImU32 mBus1Color,mBus2Color,mBus3Color,mBoxWireColor,mRegisterOutputCircleColor,mMuxColor;
+    ImU32 mBus1Color,mBus2Color,mBus3Color,mBoxWireColor,mRegisterOutputCircleColor,mMuxColor,mMicrocodeBusColor;
     ImU32 mSelectedColor,mErrorColor;
     float mBusThickness;
     
@@ -23,6 +23,7 @@ public:
 enum eHTextAlign {eTextLeft,eTextCenter,eTextRight};
 
 void addAlignedText(ImDrawList* dl,ImVec2 pos,eHTextAlign align,  std::string str,ImU32 inColor,ImFont* font,float font_size);
+void drawOrientedTriangle(ImDrawList* dl, ImVec2 pos, float l, float a, ImU32 color) ;
 
 
 

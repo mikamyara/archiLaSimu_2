@@ -21,7 +21,8 @@ class Sequencer {
     
 
     BasicRegister *SeIMS,*Cond,*Fin;
-    IOBox *Plus1,*Fetch,*OpCode,*Microcode;
+    IOBox *Plus1;
+    BasicRegister *Fetch,*OpCode,*Microcode;
     MicrocodeRegister* MicrocodeReg;
     std::vector<IOBox*> allBoxes;
     ImVec2 mPos;

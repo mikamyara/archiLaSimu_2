@@ -60,12 +60,12 @@ ArchiLaSimuApp::drawMainWindow() {
   int windowFlags =
       ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoDecoration |
       ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings |
-      ImGuiWindowFlags_NoBringToFrontOnFocus |ImGuiWindowFlags_HorizontalScrollbar |ImGuiWindowFlags_AlwaysVerticalScrollbar;
+      ImGuiWindowFlags_NoBringToFrontOnFocus |ImGuiWindowFlags_AlwaysHorizontalScrollbar |ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
   static float f = 0.0f;
   static int counter = 0;
 
-  ImGui::SetNextWindowContentSize(ImVec2(1835,0.0f));
+  ImGui::SetNextWindowContentSize(ImVec2(1832,0.0f));
   ImGui::PushFont (m_customFont);
   ImGui::Begin ("Hello, world!", NULL, windowFlags);	// Create a window called "Hello, world!" and append into it.
   ImDrawList *draw_list = ImGui::GetWindowDrawList ();
@@ -96,22 +96,22 @@ ArchiLaSimuApp::drawMainWindow() {
 
 
 
-    ImGui::Text ("This is some useful text.");	// Display some text (you can use a format strings too)
-    ImGui::Checkbox ("Demo Window", &m_show_demo_window);	// Edit bools storing our window open/close state
-    ImGui::Checkbox ("Another Window", &m_show_another_window);
+  ImGui::Text ("This is some useful text.");	// Display some text (you can use a format strings too)
+  ImGui::Checkbox ("Demo Window", &m_show_demo_window);	// Edit bools storing our window open/close state
+  ImGui::Checkbox ("Another Window", &m_show_another_window);
 
-    ImGui::SliderFloat ("float", &f, 0.0f, 1.0f);	// Edit 1 float using a slider from 0.0f to 1.0f
-    ImGui::ColorEdit3 ("clear color", (float *) &m_clear_color);	// Edit 3 floats representing a color
+  ImGui::SliderFloat ("float", &f, 0.0f, 1.0f);	// Edit 1 float using a slider from 0.0f to 1.0f
+  ImGui::ColorEdit3 ("clear color", (float *) &m_clear_color);	// Edit 3 floats representing a color
 
-    if (ImGui::Button ("Button"))	// Buttons return true when clicked (most widgets return true when edited/activated)
-      counter++;
-    ImGui::SameLine ();
-    ImGui::Text ("counter = %d", counter);
-    ImGui::SetCursorPos (ImVec2 (500, 500));
-    //ImGui::Text ("Application average %.3f ms/frame (%.1f FPS)",
-		// 1000.0f / m_io->Framerate, m_io->Framerate);  
-    ImGui::End ();
-    ImGui::PopFont ();
+  if (ImGui::Button ("Button"))	// Buttons return true when clicked (most widgets return true when edited/activated)
+    counter++;
+  ImGui::SameLine ();
+  ImGui::Text ("counter = %d", counter);
+  ImGui::SetCursorPos (ImVec2 (500, 500));
+  //ImGui::Text ("Application average %.3f ms/frame (%.1f FPS)",
+  // 1000.0f / m_io->Framerate, m_io->Framerate);  
+  ImGui::End ();
+  ImGui::PopFont ();
 }
 
 

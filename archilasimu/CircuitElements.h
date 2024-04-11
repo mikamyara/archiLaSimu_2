@@ -78,6 +78,7 @@ class IOBox {
         ImU32 mColor,mBorderColor;
         ImU32 mNameColor;
         std::string mName;
+        int mNameVPos = 6;
         IOBoxNodes mInputs,mOutputs;
 
         int mWireLen;
@@ -102,7 +103,7 @@ class BasicRegister:public IOBox{
         int minValue,maxValue;
         int mTextBufSize;
         std::string mInputTextLabel;
-        int mInputTextWidth;
+        int mInputTextWidth,mInputTextVPos;
 
 
 };
@@ -162,7 +163,15 @@ class MicrocodeRegister: public IOBox {
 public :
     MicrocodeRegister();
     MicrocodeRegister(ImVec2 inPos);
-    //virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
+    virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
+    void  RebuildNodesCoords(IOBoxNodes& ioNodesList    );
+    virtual void     drawSingleValue(ImDrawList* dl,ImVec2 pos,int hoffset,std::string formatStr,std::string name,int value);
+    virtual void     drawOutputNodes(ImDrawList* dl,ImVec2 window_pos);
+
+    int uCode, suiv,SeIMS,Cond,Fin;
+    std::string ordres;
+
+
 };
 
 

@@ -6,44 +6,45 @@
 
 class CPU;
 
-class MicrocodeTable {
-public :
-MicrocodeTable(CPU* inCPU);
+class MicrocodeTable
+{
+public:
+    MicrocodeTable (CPU * inCPU);
 
-void    ShortMicroCodeTableWidget(ImDrawList* dl, ImVec2 window_pos);
-void    MainMicrocodeTableWidget(ImDrawList* dl, ImVec2 window_pos);
-void    drawWidgets(ImDrawList* dl, ImVec2 window_pos); 
-void    Rebuild();
-bool    insertByExpression(std::string expr);
-bool matchMicrocodeExpression (std::string s,
-                               int &code, int &suiv, int &SeIMS,
-                               bool &Cond, bool &Fin,
-                               std::vector < std::string > &orders);
+    void ShortMicroCodeTableWidget (ImDrawList * dl, ImVec2 window_pos);
+    void MainMicrocodeTableWidget (ImDrawList * dl, ImVec2 window_pos);
+    void drawWidgets (ImDrawList * dl, ImVec2 window_pos);
+    void Rebuild ();
+    bool insertByExpression (std::string expr);
+    bool matchMicrocodeExpression (std::string s,
+                                   int &code, int &suiv, int &SeIMS,
+                                   int &Cond, bool &Fin,
+                                   std::vector < std::string > &orders);
 
-bool matchCommand (std::string s, std::vector < std::string > &v);
+    bool matchCommand (std::string s, std::vector < std::string > &v);
 
-bool matchSignals (const std::string input,
-                   std::vector < std::string > &result);
-int signalToCol(std::string signal);
-std::string toUpper(std::string inStr);
+    bool matchSignals (const std::string input,
+                       std::vector < std::string > &result);
+    int signalToCol (std::string signal);
+    std::string toUpper (std::string inStr);
 
 
-CPU* mCPU;
-char** mColNames;
-int mCols,mRows;
-//char** mAdrSuiv;
-std::vector<int> mSeIMS;
-std::vector<char*> mAdrSuiv;
-//std::vector<std::vector<bool>> mSignals;
-//int* mSeIMS;
-char** mSeIMSMenu;
-bool** mSignals;
-std::map<std::string, int>  sigToCol;
+    CPU *mCPU;
+    char **mColNames;
+    int mCols, mRows;
+    std::vector < int >mSeIMS;
+    std::vector < int >mCond;
 
-int mShortViewCols;
-char** mShortViewColNames;
-char** mShortViewStrings;
+    std::vector < char *>mAdrSuiv;
+
+    char **mSeIMSMenu;
+    char **mCondMenu;
+
+    bool **mSignals;
+    std::map < std::string, int >sigToCol;
+
+    int mShortViewCols;
+    char **mShortViewColNames;
+    char **mShortViewStrings;
 
 };
-
-

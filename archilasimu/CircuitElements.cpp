@@ -5,6 +5,8 @@
 #include "ArchiTheme.h"
 #include <imgui.h>
 #include "ArchiLaSimuApp.h"
+#include "stringUtils.h"
+#include <regex>
 ////---------------Wire----------------
 
 Wire::Wire(bool inArrowed) {mStatus = normal; mTargetNode = nullptr;mArrowed = inArrowed;}
@@ -68,16 +70,15 @@ Node::drawWires(ImDrawList* dl,ImU32 inBusColor,float inThickness,ImVec2 inAbsPo
             dl->AddLine(P1, P2, inBusColor, inThickness);
             dl->AddCircleFilled(P2,((int)inThickness)/2,inBusColor);
 
-
-            //if(mWires[k]->mArrowed) {
-            //    ImVec2 Point = (P1+P2)/2;
-            //    float angle = std::atan2(P2.y()-P1.y(),P2.x()-P1.x());
-            //    drawTriangle(ctx,Point,inBusColor,angle);
-            //}
+            if(mWires[k]->mArrowed) {
+                ImVec2 Point((P1.x+P2.x)/2,(P1.y+P2.y)/2);
+                float angle = std::atan2(P2.y-P1.y,P2.x-P1.x);
+                //drawTriangle(ctx,Point,inBusColor,angle);
+                drawOrientedTriangle(dl,Point, 15, angle*180/3.14159,inBusColor) ;
+            }
             destNode->drawWires(dl,inBusColor,inThickness,inAbsPos);
         }
     }
-
 }
 
 
@@ -321,7 +322,7 @@ IOBox::drawBox(ImDrawList* dl,ImVec2 window_pos) {
 void    
 IOBox::drawName(ImDrawList* dl,ImVec2 window_pos) {
     ImVec2 pos;
-    pos = ImVec2(mPos.x+window_pos.x+mRectPos.x+mRectSize.x/2,mPos.y+window_pos.y+mRectPos.y+6);
+    pos = ImVec2(mPos.x+window_pos.x+mRectPos.x+mRectSize.x/2,mPos.y+window_pos.y+mRectPos.y+mNameVPos);
 
     addAlignedText(dl,pos,eTextCenter,mName.c_str(),mNameColor,gArchiTheme.mRobotoBoldFont,24);
 
@@ -343,11 +344,12 @@ BasicRegister::BasicRegister(std::string inName,ImU32 inColor,ImVec2 inPos,int t
 
     mInputTextLabel = "##"+mName;
     mInputTextWidth = (mTextBufSize-1)*11;
+    mInputTextVPos = 35;
 }
 void     
 BasicRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos){
     
-    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);   
+    ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + mInputTextVPos);   
     ImGui::SetCursorPos (labelPos);
     ImGui::PushItemWidth(mInputTextWidth);
     ImGui::InputText(mInputTextLabel.c_str(), buf, mTextBufSize,ImGuiInputTextFlags_CharsDecimal);
@@ -628,24 +630,96 @@ MicrocodeRegister::MicrocodeRegister() {
 }
 MicrocodeRegister::MicrocodeRegister(ImVec2 inPos):IOBox("",0,inPos) {
 mColor = gArchiTheme.mMuxColor;
-mRectSize = {500,30};
+mRectSize = {500,40};
 mInputs.mPosMode=e_Bottom;
 mOutputs.mPosMode=e_Top;
 mInputs.push_back(new Node());
 mOutputs.push_back(new Node());
 mOutputs.push_back(new Node());
-mWireLen = 5;
+mWireLen = 30;
+
+uCode=0; suiv=0; SeIMS=0; Cond=0;Fin=0;
+
+}
+
+
+
+void 
+MicrocodeRegister::RebuildNodesCoords(IOBoxNodes& ioNodesList){
+    int k;
+    int betweenY = mRectSize.y/(ioNodesList.size()+1);
+    int betweenX = mRectSize.x/(ioNodesList.size()+1);
+
+    for(k=0;k<ioNodesList.size();k++) {
+        if(ioNodesList.mPosMode == e_Left)
+        {
+            ioNodesList[k]->mPos = ImVec2(0                                   ,mRectPos.y+betweenY*(k+1));
+        }
+        if(ioNodesList.mPosMode == e_Right)
+        {
+            ioNodesList[k]->mPos = ImVec2(mRectPos.x+mRectSize.x+mWireLen  ,mRectPos.y+betweenY*(k+1));
+        }    
+            
+        if(ioNodesList.mPosMode == e_Bottom)
+        {
+            ioNodesList[k]->mPos = ImVec2(mRectPos.x+ betweenX*(k+1)          ,mRectPos.y+mRectSize.y+mWireLen);
+        }    
+    }
+    if(ioNodesList.mPosMode == e_Top)
+    {   
+        ioNodesList[0]->mPos = ImVec2(mRectPos.x+ 30         , 0);
+        ioNodesList[1]->mPos = ImVec2(mRectPos.x+ 85         , 0);
+    }       
 }
 
 
-/*
-void
-MicrocodeRegister::drawOutputNodes(ImDrawList* dl,ImVec2 window_pos) {  ###
-    drawNodes(dl,window_pos,mOutputs,gArchiTheme.mBoxWireColor);
 
+void 
+MicrocodeRegister::drawName(ImDrawList* dl,ImVec2 window_pos){
+    ImVec2 pos;
+    pos = ImVec2(mPos.x+window_pos.x+mRectPos.x+10,mPos.y+window_pos.y+mRectPos.y+2);
+
+    drawSingleValue(dl, pos,30,"%03d","uCode",uCode);
+    drawSingleValue(dl, pos,85,"%03d","suiv.",suiv);
+    drawSingleValue(dl, pos,140,"%01d","SeIMS",SeIMS);
+    drawSingleValue(dl, pos,190,"%01d","Cond",Cond);
+    drawSingleValue(dl, pos,230,"%01d","Fin",Fin);
+
+    ImVec2 thePos;
+    thePos = pos; thePos.x += 260;
+    addAlignedText(dl,thePos,eTextLeft,"Ordres",mNameColor,gArchiTheme.mRobotoFont,20);
+    thePos.y +=16;
+    //ordres = "  REB1 XS eCO";
+    std::string theOrdres = trim(ordres);
+    if (theOrdres.size()==0) theOrdres="-";
+    addAlignedText(dl,thePos,eTextLeft,theOrdres.c_str(),mNameColor,gArchiTheme.mRobotoFont,20);
+
+    // suiv
 }
-*/
 
+
+void 
+MicrocodeRegister::drawSingleValue(ImDrawList* dl,ImVec2 pos,int hoffset,std::string formatStr,std::string name,int value){
+    char theBuf[10]; ImVec2 thePos;
+    sprintf(theBuf,formatStr.c_str(),value);
+    thePos = pos; thePos.x+=hoffset;
+    addAlignedText(dl,thePos,eTextCenter,name.c_str(),mNameColor,gArchiTheme.mRobotoFont,20);
+    thePos.y +=16;
+    addAlignedText(dl,thePos,eTextCenter,theBuf,mNameColor,gArchiTheme.mRobotoFont,20);
+}
+
+void    
+MicrocodeRegister::drawOutputNodes(ImDrawList* dl,ImVec2 window_pos){
+    int k;
+    ImU32 theColor;
+    for(k=0;k<mOutputs.size();k++) {
+        if(k==0) {theColor = gArchiTheme.mMicrocodeBusColor;}
+        else {theColor = gArchiTheme.mBoxWireColor;}
+        drawNode(dl,window_pos,mOutputs,k,theColor);
+     }
+}
+
+ 
 
 ////----------------Bus-----------------------
 Bus::Bus(Node* inStart ,std::string inName,ImU32 inColor,float inThickness) {mStart = inStart;mName = inName; mColor = inColor;mThickness = inThickness;}
@@ -688,14 +762,17 @@ mWireLen = 20;
 mPos = inPos;
 mInputTextWidth = 20;
 mColor= gArchiTheme.mMuxColor;
-mRectSize.y=20*(inInputs+1);
+mRectSize.y=15*(inInputs+1);
 mRectSize.x = 90;
+
 
 int k;
 for(k=0  ; k<inInputs;k++) {
     mInputs.push_back(new Node());
 }
 mOutputs.push_back(new Node());
+
+mInputTextVPos=25;
 
 }
  

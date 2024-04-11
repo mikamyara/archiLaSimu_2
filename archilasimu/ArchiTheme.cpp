@@ -1,5 +1,5 @@
 #include "ArchiTheme.h"
-
+#include <math.h>
 
 
 
@@ -15,6 +15,7 @@ mSelectedColor = IM_COL32(00,200,255,255);
 mErrorColor    = IM_COL32(188,133,0,255);
 mRegisterOutputCircleColor =  IM_COL32(00,80,140,255);
 mMuxColor = IM_COL32(75,50,30,255);
+mMicrocodeBusColor = IM_COL32(100,255,100,255); 
 
 mBusThickness  = 4.0f;
 
@@ -48,6 +49,21 @@ void addAlignedText(ImDrawList* dl,ImVec2 pos,eHTextAlign align,  std::string st
 
 //    dl->AddText(pos,inColor,str.c_str());
 }
+
+
+
+void drawOrientedTriangle(ImDrawList* dl, ImVec2 pos, float l, float a, ImU32 color) {
+    float halfL = l / 2.0f;
+    float radians = a * 3.14159265359f / 180.0f; // Convertir l'angle en radians
+
+    ImVec2 p1(pos.x + halfL * cos(radians), pos.y + halfL * sin(radians)); // Point 1
+    ImVec2 p2(pos.x + halfL * cos(radians + 2.094f), pos.y + halfL * sin(radians + 2.094f)); // Point 2 (2.094 radians = 120 degrés)
+    ImVec2 p3(pos.x + halfL * cos(radians - 2.094f), pos.y + halfL * sin(radians - 2.094f)); // Point 3
+
+    dl->AddTriangleFilled(p1, p2, p3, color);
+}
+
+
 
  /*
 
