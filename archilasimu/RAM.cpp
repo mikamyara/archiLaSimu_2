@@ -4,66 +4,69 @@
 #include <string.h>
 
 RAM::RAM()  {
-int k;
-mCols=3;
-mRows=100;
- 
-mData = new char*[mRows];
-mHelpers = new char*[mRows];
- 
-for(k=0;k<mRows;k++) {
-    mData[k] = new char[10];
-    mData[k][0] = 0;
-    mHelpers[k] = new char[100];
-    mHelpers[k][0] = 0;
+    int k;
+    mCols=3;
+    mRows=100;
+
+    mData = new char*[mRows];
+    mHelpers = new char*[mRows];
+
+    for(k=0; k<mRows; k++) {
+        mData[k] = new char[10];
+        mData[k][0] = 0;
+        mHelpers[k] = new char[100];
+        mHelpers[k][0] = 0;
+    }
+
+    mColNames = new char*[mCols];
+    for(k=0; k<mCols; k++) {
+        mColNames[k] = new char[30];
+    }
+    strcpy(mColNames[0],"Adresse");
+    strcpy(mColNames[1],"Données");
+    strcpy(mColNames[2],"Aide");
+
+
+
+    mPos = ImVec2(10,10);
+    mRectPos = ImVec2(0,0);
+    mRectSize = ImVec2(300,730);
+
+    mGlobalBackground   = IM_COL32(80, 80, 80,255);
+    mSubPanelBackground = IM_COL32(60, 60, 60,255);
+    mBorderColor = IM_COL32(140, 140, 140,255);
 }
- 
-mColNames = new char*[mCols];
-for(k=0;k<mCols;k++) {
-    mColNames[k] = new char[30];
-}
-strcpy(mColNames[0],"Adresse");
-strcpy(mColNames[1],"Données");
-strcpy(mColNames[2],"Aide");
 
- 
-
-mPos = ImVec2(10,10);
-mRectPos = ImVec2(0,0);
-mRectSize = ImVec2(300,730);
-
-mGlobalBackground   = IM_COL32(80, 80, 80,255);
-mSubPanelBackground = IM_COL32(60, 60, 60,255);
-mBorderColor = IM_COL32(140, 140, 140,255);}
-
-void   
+void
 RAM::draw(ImDrawList* dl, ImVec2 window_pos) {
 
     ImVec2 P1,P2;
-    ImVec2 thePos = ImVec2(mPos.x + window_pos.x, mPos.y + window_pos.y); 
+    ImVec2 thePos = ImVec2(mPos.x + window_pos.x, mPos.y + window_pos.y);
     P1.x = thePos.x + mRectPos.x;
     P1.y = thePos.y + mRectPos.y;
     P2.x = P1.x + mRectSize.x;
     P2.y = P1.y + mRectSize.y;
- 
-    dl->AddRectFilled(P1,P2, mGlobalBackground);  
+
+    dl->AddRectFilled(P1,P2, mGlobalBackground);
     dl->AddRect(P1,P2, mBorderColor, 0.0f, ImDrawFlags_None, 4.0f);
 
     ImVec2 theCPUNamePos = ImVec2( (P1.x + P2.x)/2-30,thePos.y+10 );
     addAlignedText(dl,theCPUNamePos,eTextCenter,"RAM",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,48);
 
-    P1.x += 10;  P1.y+=70;
-    P2.x = P1.x + 280;  P2.y = P1.y + 600;
- 
-    dl->AddRectFilled(P1,P2, mSubPanelBackground);  
+    P1.x += 10;
+    P1.y+=70;
+    P2.x = P1.x + 280;
+    P2.y = P1.y + 600;
+
+    dl->AddRectFilled(P1,P2, mSubPanelBackground);
 
 
 }
 
 
 void
-RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos){
-    ImVec2 pos = ImVec2(mPos.x + window_pos.x+10, mPos.y + window_pos.y+70); 
+RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
+    ImVec2 pos = ImVec2(mPos.x + window_pos.x+10, mPos.y + window_pos.y+70);
 
 
     static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable  | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn; // ImGuiTableFlags_Resizable
@@ -96,14 +99,14 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos){
 
                     if(column == 1) {
                         ImGui::PushItemWidth(70);
-                        ImGui::InputText("",mData[row], 8, ImGuiInputTextFlags_CharsDecimal);   
-                        ImGui::PopItemWidth();                       
-                    }else {
+                        ImGui::InputText("",mData[row], 8, ImGuiInputTextFlags_CharsDecimal);
+                        ImGui::PopItemWidth();
+                    } else {
                         ImGui::PushItemWidth(140);
-                        ImGui::InputText("",mHelpers[row], 100);   
-                        ImGui::PopItemWidth();                       
+                        ImGui::InputText("",mHelpers[row], 100);
+                        ImGui::PopItemWidth();
 
-                        }
+                    }
                     ImGui::PopID();
                 }
             ImGui::PopID();

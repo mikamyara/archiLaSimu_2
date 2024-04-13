@@ -7,7 +7,10 @@ static void glfw_error_callback(int error, const char* description)
 }
 
 
-imGuiApp::imGuiApp() {m_io = nullptr;m_window=nullptr;}
+imGuiApp::imGuiApp() {
+    m_io = nullptr;
+    m_window=nullptr;
+}
 
 
 int
@@ -50,7 +53,8 @@ imGuiApp::Initialize() {
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    m_io = &ImGui::GetIO(); (void)*m_io;
+    m_io = &ImGui::GetIO();
+    (void)*m_io;
     m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
@@ -65,12 +69,12 @@ imGuiApp::Initialize() {
 #endif
     ImGui_ImplOpenGL3_Init(m_glsl_version.c_str());
 
-return 0;
+    return 0;
 }
 
 
 int
-imGuiApp::customInit()  { 
+imGuiApp::customInit()  {
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
     // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
@@ -93,11 +97,11 @@ imGuiApp::customInit()  {
 
 
 int
-imGuiApp::Run()  { 
-int ret = Initialize();
-if(ret != 0) return -1;
-ret = customInit();
-if(ret != 0) return -1;
+imGuiApp::Run()  {
+    int ret = Initialize();
+    if(ret != 0) return -1;
+    ret = customInit();
+    if(ret != 0) return -1;
 
 
 

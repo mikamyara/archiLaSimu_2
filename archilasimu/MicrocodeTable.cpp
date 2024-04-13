@@ -5,7 +5,8 @@
 #include <iostream>
 #include <regex>
 #include <vector>
-
+#include "stringUtils.h"
+#include "ArchiTheme.h"
 MicrocodeTable::MicrocodeTable (CPU * inCPU)
 {
 
@@ -28,7 +29,7 @@ MicrocodeTable::Rebuild ()
     std::vector < std::string > theColsList;
 // build a list of all signals to consider in the MicrocodeTable
     theColsList.push_back ("uCode");
-    theColsList.push_back ("suiv.");
+    theColsList.push_back ("suiv");
     int k;
     for (k = 0; k < mCPU->mSequencer->mMuxesNames.size (); k++)
     {
@@ -74,10 +75,18 @@ MicrocodeTable::Rebuild ()
     mCols = theColsList.size ();
 
 // build Map
+    std::string uped;
     for (k = 0; k < theColsList.size (); k++)
-    {
-        sigToCol[toUpper (theColsList[k])] = k;
+    {   uped = toUpper(theColsList[k]);
+        std::cout << uped << " ";
+
+        sigToCol[uped] = k;
+
+        if(!(uped =="UCODE" || uped =="SUIV" || uped =="SEIMS" || uped =="COND" || uped =="FIN")) { 
+            sigToColNoMuxes[uped] = k;
+            }
     }
+
 
 //## Step B : build next address column (data)
     mAdrSuiv.resize (mRows);
@@ -98,7 +107,7 @@ MicrocodeTable::Rebuild ()
     {
         mCond[l] = 0;
     }
-  
+
 //## Step D : build array for all other bools
     mSignals = new bool *[mRows];
     for (int l = 0; l < mRows; l++)
@@ -132,10 +141,6 @@ MicrocodeTable::Rebuild ()
     }
 
 
-// add fetch
-    insertByExpression ("498:000:0:0:0: COB1 XS eRAM");
-    insertByExpression ("499:000:0:0:0: sM");
-    insertByExpression ("500:000:2:0:0: REB1 XS eRI");
 
 
 // ### short view management
@@ -153,8 +158,30 @@ MicrocodeTable::Rebuild ()
     {
         strcpy (mShortViewColNames[k], theColsList[k].c_str ());
     }
-    strcpy (mShortViewColNames[5], "Ordres");
 
+    mShortViewOrdresCol = 5;    
+    strcpy (mShortViewColNames[mShortViewOrdresCol], "Ordres");
+    
+    mShortViewErrors.resize(mRows);
+    for(k=0;k<mShortViewErrors.size();k++) {
+        mShortViewErrors[k]=0;
+    }
+
+
+
+
+/// precalc some callbacks
+    mShortModeCallbacks.resize(mRows);
+    for(k=0;k<mShortModeCallbacks.size();k++) {
+        mShortModeCallbacks[k].row = k;
+        mShortModeCallbacks[k].source = this;
+    }
+
+
+// add fetch
+    insertByExpression ("498:000:0:0:0: COB1 XS eRAM");
+    insertByExpression ("499:000:0:0:0: sM");
+    insertByExpression ("500:000:2:0:0: REB1 XS eRI");
 
 
 }
@@ -184,7 +211,6 @@ MicrocodeTable::drawWidgets (ImDrawList * dl, ImVec2 window_pos)
             ImVec2 thePos = window_pos;
             thePos.y += 10;
             MainMicrocodeTableWidget (dl, thePos);
-
             ImGui::EndTabItem ();
         }
     {
@@ -261,10 +287,19 @@ MicrocodeTable::ShortMicroCodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
                         ImGui::PopItemWidth ();
                     }
                     else if (column == 5)
-                    {
-                        ImGui::PushItemWidth (300);
-                        ImGui::InputText ("", mShortViewStrings[row], 100);
-                        ImGui::PopItemWidth ();
+                    {    
+                        if(mShortViewErrors[row]!=0) { 
+                            ImGui::PushStyleColor(ImGuiCol_FrameBg, gArchiTheme.mErrorColor); 
+                            ImGui::PushItemWidth (300);
+                            ImGui::InputText ("", mShortViewStrings[row], 100, ImGuiInputTextFlags_CallbackEdit, MicrocodeTable::shortTextSignalCallback,(void*)&(mShortModeCallbacks[row]));
+                            ImGui::PopItemWidth ();
+                            ImGui::PopStyleColor();
+                        }
+                        else {
+                            ImGui::PushItemWidth (300);
+                            ImGui::InputText ("", mShortViewStrings[row], 100, ImGuiInputTextFlags_CallbackEdit, MicrocodeTable::shortTextSignalCallback,(void*)&(mShortModeCallbacks[row]));
+                            ImGui::PopItemWidth ();                           
+                        }
                     }
                     else
                     {
@@ -276,15 +311,12 @@ MicrocodeTable::ShortMicroCodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
         }
         ImGui::EndTable ();
     }
-
-
 }
+
 
 void
 MicrocodeTable::MainMicrocodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 {
-
-
     static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollX | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn;	// ImGuiTableFlags_Resizable
     static ImGuiTableColumnFlags column_flags =
         ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
@@ -333,7 +365,9 @@ MicrocodeTable::MainMicrocodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
                     }
                     else
                     {
-                        ImGui::Checkbox ("", &(mSignals[row][column]));
+                        if(ImGui::Checkbox ("", &(mSignals[row][column]))) {
+                            signalsCallback(row,column,mSignals[row][column],this);
+                        }
                     }
                     ImGui::PopID ();
                 }
@@ -353,8 +387,35 @@ MicrocodeTable::MainMicrocodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 
 
 
+std::string
+MicrocodeTable::signalsToString(int row) {
+    std::string s = "";
+    for (int m = 5; m < mCols; m++)
+        { if(mSignals[row][m]) 
+            {s+= mColNames[m];
+            s+=" ";
+            }
+        }
+    return trim(s);
+}
+
 bool
-MicrocodeTable::insertByExpression (std::string expr)
+MicrocodeTable::isOrderValid(std::string inOrder,bool includeMuxes) {
+
+    std::map < std::string, int >& bdd = sigToCol;
+    if(!includeMuxes)  bdd = sigToColNoMuxes;
+
+    if (bdd.find (toUpper (inOrder)) == bdd.end ())
+    {
+        return false;
+    }
+    return true;
+}
+
+
+
+bool
+MicrocodeTable::insertByExpression (std::string expr,bool updateShortView)
 {
 
     int code, suiv, SeIMS,Cond;
@@ -366,22 +427,34 @@ MicrocodeTable::insertByExpression (std::string expr)
     if (ret == false || code > 500 || suiv > 500 || SeIMS > 3 || Cond >7)
         return false;
 
+
     for (int k = 0; k < orders.size (); k++)
     {
-        if (sigToCol.find (toUpper (orders[k])) == sigToCol.end ())
-        {
-            return false;
-        }
+        if( isOrderValid(orders[k])==false) return false;
     }
+
+
 
     sprintf (mAdrSuiv[code], "%03d", suiv);
     mSeIMS[code] = SeIMS;
     mCond[code] = Cond;
     mSignals[code][sigToCol[toUpper ("Fin")]] = Fin;
 
+
+    for (int m = 4; m < mCols; m++)
+    {
+        mSignals[code][m] = false;
+    }
+    
     for (int k = 0; k < orders.size (); k++)
     {
         mSignals[code][sigToCol[toUpper (orders[k])]] = true;
+    }
+
+
+    if(updateShortView==true) {
+
+        strcpy(mShortViewStrings[code],signalsToString(code).c_str());
     }
 
     return true;
@@ -403,11 +476,11 @@ MicrocodeTable::matchMicrocodeExpression (std::string s,
 
     if (matchCommand (s, r))
     {
-        code = std::stoi (r[0]);
-        suiv = std::stoi (r[1]);
+        code =  std::stoi (r[0]);
+        suiv =  std::stoi (r[1]);
         SeIMS = std::stoi (r[2]);
-        Cond = std::stoi (r[3]) ;
-        Fin = std::stoi (r[4]) == 1 ? true : false;
+        Cond =  std::stoi (r[3]) ;
+        Fin =   std::stoi (r[4]) == 1 ? true : false;
         matchSignals (r[5], orders);
         return true;
     }
@@ -435,29 +508,55 @@ MicrocodeTable::matchCommand (std::string s, std::vector < std::string > &v)
 }
 
 bool
-MicrocodeTable::matchSignals (const std::string input,
-                              std::vector < std::string > &result)
+MicrocodeTable::matchSignals (const std::string input, std::vector < std::string > &result)
 {
-    std::regex rgx ("\\b\\w+\\b");
-
-    std::sregex_iterator iter (input.begin (), input.end (), rgx);
-    std::sregex_iterator end;
-
-    while (iter != end)
-    {
-        result.push_back (iter->str ());
-        ++iter;
-    }
-    return !result.empty ();
+ return explode(input,result);
 }
 
-std::string MicrocodeTable::toUpper (std::string str)
-{
+void 
+MicrocodeTable::signalsCallback(int row,int column,bool p_open,MicrocodeTable* p){
+strcpy(p->mShortViewStrings[row],p->signalsToString(row).c_str());
 
-    std::transform (str.begin (), str.end (), str.begin (),[](unsigned char c)
-    {
-        return std::toupper (c);
-    }
-                   );
-    return str;
 }
+
+int 
+MicrocodeTable::shortTextSignalCallback(ImGuiInputTextCallbackData *p){
+    // get usefull data from callback
+    shortMicrocodeTextCallbackStruct* myData = (shortMicrocodeTextCallbackStruct*) p->UserData;
+    MicrocodeTable* M = myData->source;
+    std::vector<std::string> orders, validOrders;
+
+    // find space-separated strings 
+    M->matchSignals( p->Buf ,orders);
+
+    // match with orders keywords
+    bool allFound = true;
+    for (int k = 0; k < orders.size (); k++)
+    {
+        if(M->isOrderValid(orders[k],false)) {
+            validOrders.push_back(orders[k]);
+        }    
+        else {
+            allFound = false;
+        }
+    }
+    if(allFound == true) {M->mShortViewErrors[myData->row] = 0;} else {M->mShortViewErrors[myData->row]=1;}
+    
+
+    for (int m = 4; m < M->mCols; m++)
+    {
+        M->mSignals[myData->row][m] = false;
+    }
+    
+    for (int k = 0; k < validOrders.size (); k++)
+    {
+        M->mSignals[myData->row][M->sigToCol[toUpper (orders[k])]] = true;
+    }
+
+ 
+    return 0;
+
+}
+
+
+shortMicrocodeTextCallbackStruct::shortMicrocodeTextCallbackStruct() {}

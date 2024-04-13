@@ -8,7 +8,7 @@
 class CPU;
 
 class Sequencer {
-    public :
+public :
     Sequencer(CPU* inCPU);
     virtual  void    Rebuild();
     virtual  void    draw(ImDrawList* dl, ImVec2 window_pos);
@@ -18,7 +18,7 @@ class Sequencer {
 
     //virtual void     calcBus();
     virtual ~Sequencer();
-    
+
 
     BasicRegister *SeIMS,*Cond,*Fin;
     IOBox *Plus1;
