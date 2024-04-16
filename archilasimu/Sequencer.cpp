@@ -9,21 +9,19 @@ Sequencer::Sequencer(CPU* inCPU) {
     SeIMS = nullptr;
     Cond = nullptr;
     Fin= nullptr;
+    Node* n;
     SeIMS = new MUX("SeIMS",4, {150,35});
 
-    SeIMS->minValue=0;
-    SeIMS->maxValue=4;
+    SeIMS->minValue=0;  SeIMS->maxValue=4;
     SeIMS->mInputTextVPos=35;
-    Cond = new MUX("Cond",2, {0,43});
+    Cond = new MUX("RCond",2, {0,43});
 
-    Cond->minValue=0;
-    Cond->maxValue=1;
+    Cond->minValue=0;   Cond->maxValue=1;
     Cond->mInputTextVPos=20;
     Cond->mNameVPos = 0;
     Fin = new MUX("Fin",2, {290,57});
 
-    Fin->minValue=0;
-    Fin->maxValue=1;
+    Fin->minValue=0;   Fin->maxValue=1;
     Fin->mInputTextVPos=20;
     Fin->mNameVPos = 0;
     Plus1 = new IOBox("PLUS1",0, {435,0});
@@ -32,27 +30,33 @@ Sequencer::Sequencer(CPU* inCPU) {
     Plus1->mRectSize= {90,35};
     Plus1->mInputs.mPosMode=e_Right;
     Plus1->mOutputs.mPosMode=e_Left;
-    Plus1->mInputs.push_back(new Node());
+    Plus1->mInputs.push_back(n = new Node());
+    n->mFather = Plus1;
     Fetch      = new BasicRegister("Fetch",1, {235,105},3);
 
     reskinIOBox(Fetch);
+    Fin->minValue=0;   Fin->maxValue=501;
     Fetch->mRectSize= {70,45};
     Fetch->mInputTextVPos=20;
     Fetch->mNameVPos = 0;
     OpCode     = new BasicRegister("OpCode",1, {40,105},3);
 
     reskinIOBox(OpCode);
+    Fin->minValue=0;   Fin->maxValue=501;
     OpCode->mRectSize= {70,45};
     OpCode->mInputTextVPos=20;
     OpCode->mNameVPos = 0;
     Microcode  = new BasicRegister("Microcode",1, {430,57},3);
 
     reskinIOBox(Microcode);
-    Microcode->mInputs.push_back(new Node());
+    Fin->minValue=0;   Fin->maxValue=501;
+
+    Microcode->mInputs.push_back(n=new Node());
     Microcode->mOutputs.mPosMode=e_Right;
     Microcode->mRectSize= {100,45};
     Microcode->mInputTextVPos=20;
     Microcode->mNameVPos = 0;
+    n->mFather = Microcode;
 
     MicrocodeReg = new MicrocodeRegister({35,235});
     allBoxes.push_back(Cond);
@@ -82,7 +86,9 @@ Sequencer::reskinIOBox(IOBox* outBox) {
     outBox->mColor = gArchiTheme.mMuxColor;
     outBox->mOutputs.mPosMode=e_Top;
     outBox->mWireLen=20;
-    outBox->mOutputs.push_back(new Node());
+    Node* n;
+    outBox->mOutputs.push_back(n=new Node());
+    n->mFather=outBox;
     outBox->mRectSize= {80,70};
 
 }
@@ -132,11 +138,11 @@ Sequencer::calcBus() {
     //MicrocodeReg to Cond
     theBus = new Bus(MicrocodeReg->mOutputs[1],"",col,w);
     ImVec2 iVert(0,190);
-    theBus->mStart->addNewWire(true)->setTarget(new Node("suiv",HVPos(theBus->mStart->mLocalPos,iVert)))
+    theBus->mStart->addNewWire(true)->setTarget(new Node("suiv-",HVPos(theBus->mStart->mLocalPos,iVert)))
     ->addNewWire(true)->setTarget(new Node("",HVPos(Cond->mInputs[1]->mPos,iVert)))
     ->addNewWire(true)->setTarget(Cond->mInputs[1]);
     // Microcodereg to SeIMS
-    theBus->FindNode("suiv")->addNewWire(true)->setTarget(new Node("",HVPos(SeIMS->mInputs[3]->mLocalPos, iVert )))
+    theBus->FindNode("suiv-")->addNewWire(true)->setTarget(new Node("",HVPos(SeIMS->mInputs[3]->mLocalPos, iVert )))
     ->addNewWire(true)->setTarget(SeIMS->mInputs[3]);
     mBusses.push_back(theBus);
 

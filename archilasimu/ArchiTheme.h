@@ -29,6 +29,7 @@ void drawOrientedTriangle(ImDrawList* dl, ImVec2 pos, float l, float a, ImU32 co
 void DrawArrow(ImDrawList* drawList, float t, float h, float l,ImU32 fillColor,ImU32 contourColor, ImVec2 position,float angleRotation);
 void TranslatePoints(ImVec2* points, int numPoints, ImVec2 translation);
 void RotatePoints(ImVec2* points, int numPoints, ImVec2 center, float angle);
+ImU32 ArchiBusColor(const ImU32 inNormalColor,eSignalStatus inSignal);
 
 
 

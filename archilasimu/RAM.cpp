@@ -4,6 +4,8 @@
 #include <string.h>
 
 RAM::RAM()  {
+    mASM = nullptr;
+
     int k;
     mCols=3;
     mRows=100;
@@ -24,7 +26,7 @@ RAM::RAM()  {
     }
     strcpy(mColNames[0],"Adresse");
     strcpy(mColNames[1],"Données");
-    strcpy(mColNames[2],"Aide");
+    strcpy(mColNames[2],"Remarque");
 
 
 
@@ -54,9 +56,9 @@ RAM::draw(ImDrawList* dl, ImVec2 window_pos) {
     addAlignedText(dl,theCPUNamePos,eTextCenter,"RAM",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,48);
 
     P1.x += 10;
-    P1.y+=70;
+    P1.y+=130;
     P2.x = P1.x + 280;
-    P2.y = P1.y + 600;
+    P2.y = P1.y + 590;
 
     dl->AddRectFilled(P1,P2, mSubPanelBackground);
 
@@ -69,14 +71,21 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
     ImVec2 pos = ImVec2(mPos.x + window_pos.x+10, mPos.y + window_pos.y+70);
 
 
+    ImGui::SetCursorPos (pos);
+    ImGui::Checkbox("Assistant : Insertion d'un Opcode\nà partir de sa Mnémonique", &mASM->mShowAssistant);
+    mASM->drawOpcodeBuilderWindow(dl,pos);
+
+
     static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable  | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn; // ImGuiTableFlags_Resizable
     static ImGuiTableColumnFlags column_flags = ImGuiTableColumnFlags_AngledHeader | ImGuiTableColumnFlags_WidthFixed;
 
     static int frozen_cols = 1;
     static int frozen_rows = 2;
 
+
+    pos.y+=60;
     ImGui::SetCursorPos (pos);
-    if (ImGui::BeginTable("table_RAM", mCols, table_flags, ImVec2(280, 600)))
+    if (ImGui::BeginTable("table_RAM", mCols, table_flags, ImVec2(280, 590)))
     {
         //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
         for (int n = 0; n < mCols; n++)
@@ -114,5 +123,25 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
         ImGui::EndTable();
     }
 
+
+}
+
+
+
+int     
+RAM::getValue(int address) {
+    if (address>=0 && address <mRows) {
+    int value;
+    ::sscanf(mData[address],"%d",&value);
+    return value;
+    }
+    return -1;
+}
+
+void    
+RAM::setValue(int address,int data){
+    if (address>=0 && address <mRows) {
+        ::sprintf(mData[address],"%d",data);
+    }
 
 }

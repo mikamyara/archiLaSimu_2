@@ -15,7 +15,11 @@ public :
     virtual void     calcBus();
     void             getMainNodes(std::vector<std::string>& outB1,std::vector<std::string>& outB2,std::vector<std::string>& outB3);
 
+
+    Bus* getBusBySignalName(std::string inStr);
+    
     virtual ~ArchiCircuit();
+
 
 
     RegisterBus123  *RA,*RB,*RC,*RD,*CO,*RI,*RX,*RE,*RAM;
@@ -27,6 +31,7 @@ public :
     Bus *mBus1,*mBus2,*mBus3;
     std::vector<Bus*> mBuses;
     std::vector<std::string> mB1signals,mB2signals,mB3signals,mOtherSignals;
+    std::map < std::string, Bus* > sigToBus;
 
 
     ImVec2 mPos;

@@ -78,8 +78,7 @@ MicrocodeTable::Rebuild ()
     std::string uped;
     for (k = 0; k < theColsList.size (); k++)
     {   uped = toUpper(theColsList[k]);
-        std::cout << uped << " ";
-
+ 
         sigToCol[uped] = k;
 
         if(!(uped =="UCODE" || uped =="SUIV" || uped =="SEIMS" || uped =="COND" || uped =="FIN")) { 
@@ -192,12 +191,8 @@ MicrocodeTable::Rebuild ()
 void
 MicrocodeTable::drawWidgets (ImDrawList * dl, ImVec2 window_pos)
 {
-
     ImGui::SetCursorPos (window_pos);
-
     ImGui::PushStyleVar (ImGuiStyleVar_ChildBorderSize, 0);	// Ajustez la taille de la bordure ici
-
-
     ImGui::BeginChild ("Mon enfant", ImVec2 (560, 325), true);
     ImGui::PopStyleVar ();
 
@@ -226,13 +221,9 @@ MicrocodeTable::drawWidgets (ImDrawList * dl, ImVec2 window_pos)
 
         ImGui::EndTabBar ();
     }
-
     ImGui::EndChild ();
 
     // MainMicrocodeTableWidget(dl,window_pos);
-
-
-
 }
 
 
@@ -380,12 +371,7 @@ MicrocodeTable::MainMicrocodeTableWidget (ImDrawList * dl, ImVec2 window_pos)
 
 
 
-
-
-
-
-
-
+ 
 
 std::string
 MicrocodeTable::signalsToString(int row) {
@@ -427,21 +413,17 @@ MicrocodeTable::insertByExpression (std::string expr,bool updateShortView)
     if (ret == false || code > 500 || suiv > 500 || SeIMS > 3 || Cond >7)
         return false;
 
-
     for (int k = 0; k < orders.size (); k++)
     {
         if( isOrderValid(orders[k])==false) return false;
     }
-
-
 
     sprintf (mAdrSuiv[code], "%03d", suiv);
     mSeIMS[code] = SeIMS;
     mCond[code] = Cond;
     mSignals[code][sigToCol[toUpper ("Fin")]] = Fin;
 
-
-    for (int m = 4; m < mCols; m++)
+    for (int m = 5; m < mCols; m++)
     {
         mSignals[code][m] = false;
     }
@@ -476,6 +458,7 @@ MicrocodeTable::matchMicrocodeExpression (std::string s,
 
     if (matchCommand (s, r))
     {
+
         code =  std::stoi (r[0]);
         suiv =  std::stoi (r[1]);
         SeIMS = std::stoi (r[2]);

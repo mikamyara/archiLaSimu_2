@@ -14,11 +14,11 @@ ArchiTheme::ArchiTheme() {
     mAdressBusColor     = IM_COL32(10,45,00,255);
 
     mBoxWireColor  = IM_COL32(255,255,255,255);
-    mSelectedColor = IM_COL32(00,200,255,255);
+    mSelectedColor = IM_COL32(75,255,75,255);
     mErrorColor    = IM_COL32(188,133,0,120);
     mRegisterOutputCircleColor =  IM_COL32(00,80,140,255);
     mMuxColor = IM_COL32(75,50,30,255);
-    mMicrocodeBusColor = IM_COL32(100,255,100,255);
+    mMicrocodeBusColor = IM_COL32(00,200,255,255);
 
     mBusThickness  = 4.0f;
 
@@ -125,7 +125,16 @@ void DrawArrow(ImDrawList* drawList, float t, float h, float l,ImU32 fillColor,I
 
 }
 
- 
+ImU32 ArchiBusColor(const ImU32 inNormalColor,eSignalStatus inSignal){
+   if( inSignal == selected ) {
+            return gArchiTheme.mSelectedColor;
+    }
+   if(inSignal == error) {
+        return gArchiTheme.mErrorColor;
+
+   }
+   return inNormalColor;
+}
 
 /*
 
@@ -145,26 +154,4 @@ NVGcolor ArchiBusColor(const NVGcolor& inNormalColor,eSignalStatus inSignal){
    else if(inSignal == error) return  gArchiTheme.mErrorColor;
    else return inNormalColor;
 }
-
-void drawTriangle(NVGcontext* ctx,Vector2i pos,NVGcolor inColor,double angle){
-   int delta = 15;
-
-   nvgFillColor(ctx, inColor);
-   //nvgResetTransform(ctx);
-
-
-   nvgSave(ctx);
-   nvgTranslate(ctx, pos.x(),pos.y());
-   nvgRotate(ctx,angle);
-   nvgTranslate(ctx, -pos.x(),-pos.y());
-   nvgBeginPath(ctx);
-   nvgMoveTo(ctx,pos.x()+delta/2,pos.y());
-   nvgLineTo(ctx,pos.x()-delta/2,pos.y()+delta/2);
-   nvgLineTo(ctx,pos.x()-delta/2,pos.y()-delta/2);
-   nvgLineTo(ctx,pos.x()+delta/2,pos.y());
-   nvgClosePath(ctx);
-   nvgFill(ctx);
-   nvgRestore(ctx);
-
-
-}*/
+*/

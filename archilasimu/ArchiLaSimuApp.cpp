@@ -1,7 +1,7 @@
 #include "ArchiLaSimuApp.h"
 #include "ArchiTheme.h"
 #include "CPU.h"
-
+#include "Assembleur.h"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -32,16 +32,19 @@ ArchiLaSimuApp::customInit ()
     gArchiTheme.LoadFonts(m_io);
     m_customFont = gArchiTheme.mRobotoFont;
 
+
+    mASM = new Assembleur();
     mCPU = new CPU();
-    mCPU->Rebuild();
     mRAM = new RAM();
     mExternalBus = new ExtBus();
-//mArchiCircuit = new ArchiCircuit();
-//mArchiCircuit->Rebuild();
+    
+    mRAM->mASM = mASM;
 
-//mTestBox.mInputs.push_back(new Node());
-//mTestBox.mOutputs.push_back(new Node());
-
+    mCPU->mExternalBus = mExternalBus;
+    mCPU->mRAM = mRAM;
+    mCPU->mASM = mASM;
+    mCPU->Rebuild();
+    mCPU->Reset();    
 
     return 0;
 }

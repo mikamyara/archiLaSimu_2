@@ -34,7 +34,7 @@ public:
 
     bool matchSignals (const std::string input,
                        std::vector < std::string > &result);
-    int signalToCol (std::string signal);
+   // int signalToCol (std::string signal);
     std::string signalsToString(int row);
     bool isOrderValid(std::string inOrder,bool includeMuxes=true);
 

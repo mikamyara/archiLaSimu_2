@@ -3,7 +3,7 @@
 #include "ArchiCircuit.h"
 #include "CPU.h"
 #include "RAM.h"
-
+#include "Assembleur.h"
 
 class ArchiLaSimuApp : public imGuiApp {
 public :
@@ -26,5 +26,6 @@ public :
     CPU* mCPU;
     RAM* mRAM;
     ExtBus* mExternalBus;
+    Assembleur* mASM;
 };
 

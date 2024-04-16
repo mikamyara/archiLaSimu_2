@@ -11,6 +11,7 @@ enum eSignalStatus { normal,selected,error};
 
 
 class Node;
+class IOBox;
 ////---------------Wire----------------
 
 class Wire {
@@ -33,12 +34,15 @@ public:
     Node* FindFollowingNode(const std::string inName);
     void drawWires(ImDrawList* dl,ImU32 inBusColor,float inThickness,ImVec2 inAbsPos);
     bool changeStatus(Node* target,eSignalStatus newStatus);
+    void changeAllSonsStatus(eSignalStatus newStatus);
+
 
     std::vector<Wire*> mWires;
     ImVec2 mPos; // is relative to box
     ImVec2 mLocalPos; // is relative to ArchiWidget
     std::string mName;
     eSignalStatus mStatus;
+    IOBox* mFather; 
 };
 
 ///----------------IOBox---------------
@@ -170,8 +174,6 @@ public :
 
     int uCode, suiv,SeIMS,Cond,Fin;
     std::string ordres;
-
-
 };
 
 
@@ -183,6 +185,7 @@ public:
     Bus(Node* inStart,std::string inName,ImU32 inColor,float inThickness); //////// !!! auto init  ImU32 ?
     Node* FindNode(const std::string inName);
     void changePortionStatus(std::string inTargetNodeName,eSignalStatus newStatus);
+    void changeBusStatus(eSignalStatus newStatus);
     virtual  void    draw(ImDrawList* dl, ImVec2 window_pos);
     virtual ~Bus();
 
@@ -196,6 +199,8 @@ public:
 class MUX:public BasicRegister {
 public:
     MUX(std::string inName="",int inInputs=0,ImVec2 inPos= {0,0});
+    virtual void draw(ImDrawList* dl, ImVec2 window_pos);
+
     int mCurrentValue;
 
 };
@@ -207,8 +212,8 @@ class ExtBus {
     ExtBus();
     virtual void draw(ImDrawList* dl, ImVec2 window_pos);
     bool mAdressBusSelected;
-    bool mDataToCPU;
-    bool mDataToRAM;
+    bool mRAMToCPU;
+    bool mCPUToRAM;
 
     ImVec2 mPos;
 };

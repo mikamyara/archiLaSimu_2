@@ -9,9 +9,7 @@ ArchiCircuit::ArchiCircuit() {
     mB3signals = {"eRE","eRA","eRB","eRC","eRD","eRX","eRI","eCO","eRAM"};
     mOtherSignals = {"sM","eM"};
 
-
-
-    mPos = ImVec2(15,150);
+    mPos = ImVec2(15,240);
     RA = new RegisterBus123("RA",IM_COL32(0,50,50,255),ImVec2(380,100));
     RB = new RegisterBus123("RB",IM_COL32(0,60,60,255),ImVec2(380,190));
     RC = new RegisterBus123("RC",IM_COL32(0,70,70,255),ImVec2(380,280));
@@ -29,13 +27,10 @@ ArchiCircuit::ArchiCircuit() {
     sensEch->mInputs.mPosMode = e_Bottom;sensEch->mBorderColor = sensEch->mColor;
     sensEch->mRectSize = ImVec2(90,72);
 
-    //std::cout << "YOUHOU" << RAM->mBus1Node << " ";
     RAM->mOutputs.resize(0);
     RAM->mBus1Node = nullptr;
     RAM->mBus2Node = nullptr;
     RAM->mInputs.mPosMode = e_Bottom;
-    //std::cout << RAM->mBus1Node << "\n";
-
 
     allRegisters.push_back(RE);
     allRegisters.push_back(RAM);
@@ -48,8 +43,6 @@ ArchiCircuit::ArchiCircuit() {
     allRegisters.push_back(RC);
     allRegisters.push_back(RD);
     allRegisters.push_back(OP);
-
-
 
 }
 
@@ -64,9 +57,12 @@ ArchiCircuit::Rebuild() {
         allRegisters[k]->Rebuild();
     }
 
-
     calcBus();
-
+/*
+    mBus1->changePortionStatus("RIB1",selected);
+    mBus2->changePortionStatus("RBB2",selected);
+    mBus3->changePortionStatus("eRE",selected);
+*/
 }
 
 
@@ -82,7 +78,6 @@ ArchiCircuit::calcBus() {
     mBus1 = nullptr;
     mBus2 = nullptr;
     mBus3 = nullptr;
-
 
     mBus1 = new Bus(OP->mBus1Node,"Bus1",gArchiTheme.mBus1Color,gArchiTheme.mBusThickness);
     Node* theNode = mBus1->mStart;
@@ -101,7 +96,6 @@ ArchiCircuit::calcBus() {
     mBus1->FindNode("COB1REB1")->addNewWire()->setTarget(CO->mBus1Node)
     ->addNewWire()->setTarget(RI->mBus1Node)
     ->addNewWire()->setTarget(RX->mBus1Node);
-
 
     mBus2 = new Bus(OP->mBus2Node,"Bus2",gArchiTheme.mBus2Color,gArchiTheme.mBusThickness);
     theNode = mBus2->mStart;
@@ -150,6 +144,7 @@ ArchiCircuit::calcBus() {
     mBuses.push_back(mBus2);
     mBuses.push_back(mBus3);
 
+
 }
 
 
@@ -176,6 +171,5 @@ ArchiCircuit::drawWidgets(ImDrawList* dl, ImVec2 pos) {
         allRegisters[k]->drawWidgets(dl,thePos);
     }
 }
-
 
 

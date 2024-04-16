@@ -35,6 +35,7 @@ Node::Node(std::string inName,ImVec2 inPos) {
     mName = inName;
     mStatus = normal;
     mLocalPos = mPos;
+    mFather = nullptr;
 }
 
 Wire*
@@ -62,23 +63,21 @@ Node::FindFollowingNode(const std::string inName) {
 }
 void
 Node::drawWires(ImDrawList* dl,ImU32 inBusColor,float inThickness,ImVec2 inAbsPos) {
-
     for(int k=0; k<mWires.size(); k++) {
         if(mWires[k] != nullptr && mWires[k]->mTargetNode != nullptr) {
             Node* destNode = mWires[k]->mTargetNode;
-
+            ImU32 theColor = ArchiBusColor(inBusColor,mWires[k]->mStatus);
             ImVec2 P1,P2;
             P1 =  ImVec2( (int)(inAbsPos.x + mLocalPos.x),(int)(inAbsPos.y + mLocalPos.y) );
             P2 =  ImVec2( (int)(inAbsPos.x + destNode->mLocalPos.x),(int)(inAbsPos.y + destNode->mLocalPos.y));
-            dl->AddCircleFilled(P1,((int)inThickness)/2,inBusColor);
-            dl->AddLine(P1, P2, inBusColor, inThickness);
-            dl->AddCircleFilled(P2,((int)inThickness)/2,inBusColor);
+            dl->AddCircleFilled(P1,((int)inThickness)/2,theColor);
+            dl->AddLine(P1, P2, theColor, inThickness);
+            dl->AddCircleFilled(P2,((int)inThickness)/2,theColor);
 
             if(mWires[k]->mArrowed) {
                 ImVec2 Point((P1.x+P2.x)/2,(P1.y+P2.y)/2);
                 float angle = std::atan2(P2.y-P1.y,P2.x-P1.x);
-                //drawTriangle(ctx,Point,inBusColor,angle);
-                drawOrientedTriangle(dl,Point, 15, angle*180/3.14159,inBusColor) ;
+                drawOrientedTriangle(dl,Point, 15, angle*180/3.14159,theColor) ;
             }
             destNode->drawWires(dl,inBusColor,inThickness,inAbsPos);
         }
@@ -99,7 +98,7 @@ Node::changeStatus(Node* target,eSignalStatus newStatus) {
                 if(mWires[k]->mTargetNode->changeStatus(target,newStatus)==true) {
                     //mStatus = newStatus;
                     mWires[k]->mStatus = newStatus;
-                    return true;
+                     return true;
                 }
             }
         }
@@ -107,6 +106,14 @@ Node::changeStatus(Node* target,eSignalStatus newStatus) {
     }
 }
 
+void
+Node::changeAllSonsStatus(eSignalStatus newStatus){
+    mStatus = newStatus;
+    for(int k=0;k<mWires.size();k++) {
+        mWires[k]->mStatus = newStatus;
+        mWires[k]->mTargetNode->changeAllSonsStatus(newStatus);
+    }
+}
 
 
 
@@ -308,7 +315,8 @@ void
 IOBox::drawNodes(ImDrawList* dl,ImVec2 window_pos, const IOBoxNodes& theNodes,ImU32 inBusColor) {
     int k;
     for(k=0; k<theNodes.size(); k++) {
-        drawNode(dl,window_pos,theNodes,k,inBusColor);
+        ImU32 busColor =  ArchiBusColor(inBusColor,theNodes[k]->mStatus);
+        drawNode(dl,window_pos,theNodes,k,busColor);
     }
 }
 
@@ -355,6 +363,7 @@ BasicRegister::BasicRegister(std::string inName,ImU32 inColor,ImVec2 inPos,int t
     mInputTextLabel = "##"+mName;
     mInputTextWidth = (mTextBufSize-1)*11;
     mInputTextVPos = 35;
+    minValue=0; maxValue=99999;
 }
 void
 BasicRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos) {
@@ -390,8 +399,16 @@ BasicRegister::getValue()  {
 int
 BasicRegister::setValue(int val) {
     int ret = filterValue(val);
+ 
     if(ret == 0 ) {
-        sprintf(buf,"%d",val);
+        char localBuf[100];
+        char formatStr[10];
+        //sprintf(formatStr,"%%0%dd",mTextBufSize-1);
+        sprintf(formatStr,"%%d",mTextBufSize-1);
+
+        sprintf(localBuf,formatStr,val);
+        memcpy(buf,localBuf,mTextBufSize);
+        //sprintf(buf,"%d",val);
     }
     return ret;
 }
@@ -424,6 +441,11 @@ RegisterBus123::RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos):Ba
     mOutputs.push_back(mBus1Node=new Node());
     mInputs.push_back(mBus3Node=new Node());
 
+    mBus1Node->mFather = this;
+    mBus2Node->mFather = this;
+    mBus3Node->mFather = this;
+    
+
     // set nodes names
     if(mName.size() != 0) {
         mBus1Node->mName = mName+"B1";
@@ -447,12 +469,12 @@ RegisterBus123::drawOutputNodes(ImDrawList* dl,ImVec2 window_pos) {
         else {
             busColor = gArchiTheme.mBus2Color;
         }
+        busColor =  ArchiBusColor(busColor,theNodes[k]->mStatus);
         drawNode(dl,window_pos,theNodes,k,busColor);
     }
 }
 void
 RegisterBus123::drawInputNodes(ImDrawList* dl,ImVec2 window_pos) {
-    //std::cout << "YOUHOU\n";
     drawNodes(dl,window_pos,mInputs,gArchiTheme.mBus3Color);
 
 }
@@ -473,15 +495,15 @@ RegisterBus123::draw(ImDrawList* dl, ImVec2 window_pos) {
 
 void
 RegisterBus123::drawLabels(ImDrawList* dl,ImVec2 window_pos) {
-//if(mName == "RAM") {std::cout << mBus1Node <<" " << mBus2Node << "\n";}
-    ImVec2 P1,P2,C;
+     ImVec2 P1,P2,C;
     eHTextAlign mode = eTextLeft;
     // Bus 3
     if(mBus3Node != nullptr) {
         calcWirePosition(window_pos,mInputs,0,P1,P2);
         C.x = (P1.x + P2.x)/2 ;
         C.y = (P1.y + P2.y)/2;
-        dl->AddCircleFilled(C,5,gArchiTheme.mBus3Color);
+        ImU32 theColor = ArchiBusColor( gArchiTheme.mBus3Color,mBus3Node->mStatus);
+        dl->AddCircleFilled(C,5,theColor);
         if(mInputs.mPosMode == e_Left) {
             C.y-=25;
             mode =eTextCenter;
@@ -500,7 +522,8 @@ RegisterBus123::drawLabels(ImDrawList* dl,ImVec2 window_pos) {
         calcWirePosition(window_pos,mOutputs,1,P1,P2);
         C.x = (P1.x + P2.x)/2 ;
         C.y = (P1.y + P2.y)/2;
-        dl->AddCircleFilled(C,8,gArchiTheme.mRegisterOutputCircleColor);
+        ImU32 theColor = ArchiBusColor(gArchiTheme.mRegisterOutputCircleColor,mBus1Node->mStatus);
+        dl->AddCircleFilled(C,8,theColor);
         dl->AddCircle(C,8,gArchiTheme.mBus1Color,12,2);
         C.y+=8;
         addAlignedText(dl,C,eTextCenter,mOutputs[1]->mName.c_str(),gArchiTheme.mBus1Color,gArchiTheme.mRobotoBoldFont,20);
@@ -511,7 +534,8 @@ RegisterBus123::drawLabels(ImDrawList* dl,ImVec2 window_pos) {
         calcWirePosition(window_pos,mOutputs,0,P1,P2);
         C.x = (P1.x + P2.x)/2 ;
         C.y = (P1.y + P2.y)/2;
-        dl->AddCircleFilled(C,8,gArchiTheme.mRegisterOutputCircleColor);
+        ImU32 theColor = ArchiBusColor(gArchiTheme.mRegisterOutputCircleColor,mBus2Node->mStatus);
+        dl->AddCircleFilled(C,8,theColor);
         dl->AddCircle(C,8,gArchiTheme.mBus2Color,12,2);
         C.y-=27;
         addAlignedText(dl,C,eTextCenter,mOutputs[0]->mName.c_str(),gArchiTheme.mBus2Color,gArchiTheme.mRobotoBoldFont,20);
@@ -625,9 +649,6 @@ InstructionRegister::drawName(ImDrawList* dl,ImVec2 window_pos) {
     addAlignedText(dl,pos,eTextCenter,"OPCode",mNameColor,gArchiTheme.mRobotoFont,20);
     pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + mRectSize.x/2,mPos.y + window_pos.y + mRectPos.y + 95);
     addAlignedText(dl,pos,eTextCenter,"Formatteur",mNameColor,gArchiTheme.mRobotoFont,20);
-
-
-
 }
 
 void
@@ -662,20 +683,24 @@ InstructionRegister::Rebuild() {
     }
     RebuildLocalCoords();
 }
-
-
 /////-------------MicrocodeRegister-----------
 MicrocodeRegister::MicrocodeRegister() {
 
 }
+
 MicrocodeRegister::MicrocodeRegister(ImVec2 inPos):IOBox("",0,inPos) {
     mColor = gArchiTheme.mMuxColor;
     mRectSize = {500,40};
     mInputs.mPosMode=e_Bottom;
     mOutputs.mPosMode=e_Top;
-    mInputs.push_back(new Node());
-    mOutputs.push_back(new Node());
-    mOutputs.push_back(new Node());
+    Node* n1,*n2,*n3;
+    mInputs.push_back(n1 = new Node());
+    mOutputs.push_back(n2 = new Node());
+    mOutputs.push_back(n3 = new Node());
+    n1->mFather = this;
+    n2->mFather = this;
+    n3->mFather = this;
+
     mWireLen = 30;
 
     uCode=0;
@@ -797,6 +822,11 @@ Bus::changePortionStatus(std::string targetNodeName,eSignalStatus newStatus) {
     mStart->changeStatus(targetNode,newStatus);
 }
 
+void 
+Bus::changeBusStatus(eSignalStatus newStatus){
+    mStart->mStatus = newStatus;
+    mStart->changeAllSonsStatus(newStatus);
+}
 
 
 void
@@ -805,8 +835,7 @@ Bus::draw(ImDrawList* dl,ImVec2 window_pos) {
     //Vector2i the_size = preferred_size(ctx);
 
     //nvgLineCap(ctx, NVG_ROUND);
-    //std::cout <<"BUS\n";
-    mStart->drawWires(dl,mColor,mThickness,window_pos);
+     mStart->drawWires(dl,mColor,mThickness,window_pos);
 
 }
 
@@ -820,32 +849,60 @@ MUX::MUX(std::string inName,int inInputs,ImVec2 inPos):BasicRegister(inName,0,in
     mColor= gArchiTheme.mMuxColor;
     mRectSize.y=15*(inInputs+1);
     mRectSize.x = 90;
-
+    Node* n;
 
     int k;
     for(k=0  ; k<inInputs; k++) {
-        mInputs.push_back(new Node());
+        mInputs.push_back(n=new Node());
+        n->mFather = this;
     }
-    mOutputs.push_back(new Node());
-
+    mOutputs.push_back(n=new Node());
+    n->mFather = this;
     mInputTextVPos=25;
 
 }
 
+void 
+MUX::draw(ImDrawList* dl, ImVec2 window_pos){
+     BasicRegister::draw(dl,window_pos);
+    int k;
+    ImVec2 thePos;
+    char theBuf[10];
+    for(k=0  ; k<mInputs.size(); k++) {
+        thePos = mInputs[k]->mLocalPos;
+        thePos.x += window_pos.x + mWireLen+5; thePos.y += window_pos.y-10;
+         sprintf(theBuf,"%d",k);
+        addAlignedText(dl,thePos,eTextLeft, theBuf,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    
+    }
+}
 
 ////////------ ExtBus------------------
 ExtBus::ExtBus(){ 
-    mPos = {400,190};
+    mPos = {400,280};
 }
 
 void
 ExtBus::draw(ImDrawList* dl, ImVec2 window_pos){
-    ImU32 AdressBusCol =  gArchiTheme.mAdressBusColor;
-    ImU32 RAMToCPUCol =  gArchiTheme.mDataBusColor;
-    ImU32 CPUToRAMCol =  gArchiTheme.mDataBusColor;
+    ImU32 AdressBusCol      =  gArchiTheme.mAdressBusColor;
+    ImU32 RAMToCPUCol       =  gArchiTheme.mDataBusColor;
+    ImU32 RAMToCPUsignalCol = IM_COL32_WHITE;
+    ImU32 CPUToRAMCol       =  gArchiTheme.mDataBusColor;
+    ImU32 CPUToRAMsignalCol = IM_COL32_WHITE;
 
-    //mDataToCPU;
-    //mDataToRAM;
+
+    if(mAdressBusSelected) {
+        AdressBusCol = gArchiTheme.mSelectedColor;
+    }
+    if(mRAMToCPU) {
+        RAMToCPUCol       = gArchiTheme.mSelectedColor;
+        RAMToCPUsignalCol = gArchiTheme.mSelectedColor;     
+    }
+    if(mCPUToRAM) {
+        CPUToRAMCol       = gArchiTheme.mSelectedColor;
+        CPUToRAMsignalCol = gArchiTheme.mSelectedColor;
+    }
+
 
     ImVec2 arrowPos = window_pos;
     ImVec2 textPos,symbPos;
@@ -880,12 +937,14 @@ ExtBus::draw(ImDrawList* dl, ImVec2 window_pos){
     textPos = arrowPos; textPos.x +=50;textPos.y -=24;
     addAlignedText(dl,textPos,eTextLeft, "sM",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,20) ;
 
-    DrawArrow(dl, 15, 3, 160,  IM_COL32_WHITE,IM_COL32_WHITE, arrowPos, 90);
+    DrawArrow(dl, 15, 3, 160,  RAMToCPUsignalCol,RAMToCPUsignalCol, arrowPos, 90);
     arrowPos.y +=20;
     textPos.y+=45;
     addAlignedText(dl,textPos,eTextLeft, "eM",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,20) ;
 
-    DrawArrow(dl, 15, 3, 160,  IM_COL32_WHITE,IM_COL32_WHITE, arrowPos, 90);
+    DrawArrow(dl, 15, 3, 160,  CPUToRAMsignalCol,CPUToRAMsignalCol, arrowPos, 90);
+
+
 
 
     arrowPos.y +=120;
