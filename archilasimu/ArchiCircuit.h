@@ -22,10 +22,11 @@ public :
 
 
 
-    RegisterBus123  *RA,*RB,*RC,*RD,*CO,*RI,*RX,*RE,*RAM;
+    RegisterBus123  *RA,*RB,*RC,*RD,*CO,*RX,*RE,*RAM;
     IOBox *sensEch;
 
     CombinatorialOperator* OP;
+    InstructionRegister* RI;
     std::vector<IOBox*> allRegisters;
 
     Bus *mBus1,*mBus2,*mBus3;

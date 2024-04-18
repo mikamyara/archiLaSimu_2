@@ -17,8 +17,8 @@ ArchiCircuit::ArchiCircuit() {
 
     OP = new CombinatorialOperator("OP",IM_COL32(20,20,100,255),ImVec2(630,150));
     CO = new RegisterBus123("CO",IM_COL32(100,0,0,255),ImVec2(130,106));
-    RI = new InstructionRegister("RI",IM_COL32(50,0,100,255),ImVec2(130,205));
-    RX = new RegisterBus123("RX",IM_COL32(75,0,75,255),ImVec2(130,370));
+    RI = new InstructionRegister("RI",IM_COL32(75,0,75,255),ImVec2(130,205));
+    RX = new RegisterBus123("RX",IM_COL32(50,0,100,255),ImVec2(130,370));
 
     RE = new RegisterBus123("RE",IM_COL32(0,80,0,255),ImVec2(15,15));
     RE->mInputs.mPosMode = e_Bottom;
@@ -81,7 +81,6 @@ ArchiCircuit::calcBus() {
 
     mBus1 = new Bus(OP->mBus1Node,"Bus1",gArchiTheme.mBus1Color,gArchiTheme.mBusThickness);
     Node* theNode = mBus1->mStart;
-    //std::cout << theNode->mLocalPos<<" AA " << RE.mBus1Node->mLocalPos << "\n";
     theNode->addNewWire()->setTarget(new Node("OPB1REB1",HVPos(OP->mBus1Node->mLocalPos,RE->mBus1Node->mLocalPos)))
     ->addNewWire()->setTarget(new Node("RAB1REB1",HVPos(RA->mBus1Node->mLocalPos,RE->mBus1Node->mLocalPos)))
     ->addNewWire()->setTarget(new Node("COB1REB1",HVPos(CO->mBus1Node->mLocalPos,RE->mBus1Node->mLocalPos)))

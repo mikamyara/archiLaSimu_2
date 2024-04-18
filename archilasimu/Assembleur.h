@@ -2,6 +2,7 @@
 #include <string>
 #include <map>
 #include "imgui.h"
+#include "RAM.h"
 
 
 class OpDesc {
@@ -31,10 +32,10 @@ class Assembleur {
         virtual void drawMnemonicsWindow(ImDrawList* dl, ImVec2 window_pos);
         virtual void drawOpcodeBuilderWindow(ImDrawList* dl, ImVec2 window_pos);
         void buildMenuStrings();
-
+        void buildOpcodeFromMenu();
 
        
-        std::map<std::string,std::string> modes;
+        std::map<std::string,std::string> modes,modesInv;
         std::map < std::string,  int> mnemonics;
         std::map <  int, std::string> Opcodes;
 
@@ -43,8 +44,10 @@ class Assembleur {
         int mRows,mCols;
 
         char** menuMnemonics;
+        int nbMenuMnemonics;
         std::map<std::string,OpDesc> mOpDescForMenu;
         
+        RAM* mRAM;
         
         
         bool mShowAssistant;

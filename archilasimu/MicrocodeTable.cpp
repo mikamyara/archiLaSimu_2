@@ -78,7 +78,7 @@ MicrocodeTable::Rebuild ()
     std::string uped;
     for (k = 0; k < theColsList.size (); k++)
     {   uped = toUpper(theColsList[k]);
- 
+       // std::cout << uped <<" "<< k << "\n";
         sigToCol[uped] = k;
 
         if(!(uped =="UCODE" || uped =="SUIV" || uped =="SEIMS" || uped =="COND" || uped =="FIN")) { 
@@ -176,11 +176,6 @@ MicrocodeTable::Rebuild ()
         mShortModeCallbacks[k].source = this;
     }
 
-
-// add fetch
-    insertByExpression ("498:000:0:0:0: COB1 XS eRAM");
-    insertByExpression ("499:000:0:0:0: sM");
-    insertByExpression ("500:000:2:0:0: REB1 XS eRI");
 
 
 }
@@ -388,10 +383,10 @@ MicrocodeTable::signalsToString(int row) {
 bool
 MicrocodeTable::isOrderValid(std::string inOrder,bool includeMuxes) {
 
-    std::map < std::string, int >& bdd = sigToCol;
-    if(!includeMuxes)  bdd = sigToColNoMuxes;
+    std::map < std::string, int >* bdd = &sigToCol;
+    if(!includeMuxes)  bdd = &sigToColNoMuxes;
 
-    if (bdd.find (toUpper (inOrder)) == bdd.end ())
+    if (bdd->find (toUpper (inOrder)) == bdd->end ())
     {
         return false;
     }
@@ -511,7 +506,7 @@ MicrocodeTable::shortTextSignalCallback(ImGuiInputTextCallbackData *p){
 
     // find space-separated strings 
     M->matchSignals( p->Buf ,orders);
-
+ 
     // match with orders keywords
     bool allFound = true;
     for (int k = 0; k < orders.size (); k++)
@@ -523,23 +518,24 @@ MicrocodeTable::shortTextSignalCallback(ImGuiInputTextCallbackData *p){
             allFound = false;
         }
     }
-    if(allFound == true) {M->mShortViewErrors[myData->row] = 0;} else {M->mShortViewErrors[myData->row]=1;}
+   if(allFound == true) {M->mShortViewErrors[myData->row] = 0;} else {M->mShortViewErrors[myData->row]=1;}
     
 
-    for (int m = 4; m < M->mCols; m++)
+    // erase previously connected keywords
+    for (int m = 5; m < M->mCols; m++)
     {
         M->mSignals[myData->row][m] = false;
     }
     
+    // rewrite keywords
     for (int k = 0; k < validOrders.size (); k++)
     {
         M->mSignals[myData->row][M->sigToCol[toUpper (orders[k])]] = true;
     }
 
- 
     return 0;
 
-}
+} 
 
 
 shortMicrocodeTextCallbackStruct::shortMicrocodeTextCallbackStruct() {}

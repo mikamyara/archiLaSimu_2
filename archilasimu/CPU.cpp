@@ -106,25 +106,34 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     if (ImGui::BeginTabBar ("ASM ou Phase")) {
 
             if (ImGui::BeginTabItem ("Microcode Phase par Phase"))
-            {
-                if (ImGui::Button("Exécuter la prochaine\n phase du microcode"))
+            {   ImVec2 theLocalPos =ImGui::GetCursorPos();
+                theLocalPos.x+=50;
+                theLocalPos.y+=10;
+                ImGui::SetCursorPos(theLocalPos);
+                ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(60,150,60,255)); 
+                if (ImGui::Button("Exécuter une phase\n      du microcode"))
                 {
                 int code = getCurrent_uCode();
-                //std::cout << "NEW CODE : "<< code << "\n";
                 runPhase(code,selected);
 
                 }    
+            ImGui::PopStyleColor();
             ImGui::EndTabItem ();
 
             }
 
             if (ImGui::BeginTabItem ("Assembleur Pas à Pas"))
-            {
+            { ImVec2 theLocalPos =ImGui::GetCursorPos();
+                theLocalPos.x+=50;
+                theLocalPos.y+=10;
+                ImGui::SetCursorPos(theLocalPos);
+                ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(60,150,60,255)); 
+
                 // Contenu de l'onglet 2
                 if (ImGui::Button(" Exécuter la prochaine\ninstruction assembleur"))
                 {
-               // std::cout << "BB\n";
                 }    
+            ImGui::PopStyleColor();
             ImGui::EndTabItem ();
 
             }
@@ -157,13 +166,11 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     ImGui::SetCursorPos (pos);    
     if (ImGui::Button("   Charger Table   \n    Microcode"))
     {
-    //std::cout << "BB\n";
     }   
     pos.y +=50;
     ImGui::SetCursorPos (pos);         
     if (ImGui::Button("Enregistrer Table\n     Microcode"))
     {
-    //std::cout << "CC\n";
     }    
 
     pos = savePos;
@@ -223,8 +230,8 @@ return -1;
 
 void 
 CPU::Reset() {
-    setRegisterValue("RA",10);
-    setRegisterValue("RB",15);
+    setRegisterValue("RA",0);
+    setRegisterValue("RB",0);
     setRegisterValue("RC",0);
     setRegisterValue("RD",0);
     setRegisterValue("RE",0);
@@ -232,22 +239,37 @@ CPU::Reset() {
     setRegisterValue("RX",0);
     setRegisterValue("CO",0);
     setRegisterValue("RAM",0);
+    ::sprintf(mArchiCircuit->OP->buf,"%s","");
     setRegisterValue("Cond",0);
     setRegisterValue("Fin",0);
     setRegisterValue("SeIMS",0);
-    setRegisterValue("OpCode",0);
+    setRegisterValue("RI_OpCode",0);
     setRegisterValue("Fetch",498);
-    setRegisterValue("Microcode",0);
+    setRegisterValue("Microcode",498);
 
     // ui related
     mArchiCircuit->mBus1->changeBusStatus(normal);
     mArchiCircuit->mBus2->changeBusStatus(normal);
     mArchiCircuit->mBus3->changeBusStatus(normal);
 
+    // add fetch
+    mSequencer->mCodeTable->insertByExpression ("498:000:0:0:0: COB1 XS eRAM");
+    mSequencer->mCodeTable->insertByExpression ("499:000:0:0:0: sM");
+    mSequencer->mCodeTable->insertByExpression ("500:000:2:0:0: REB1 XS eRI");
 
-    mSequencer->mCodeTable->insertByExpression("000:005:2:5:1: RAB1 RBB2 ADD eCO eRC");
 
-    refreshMicroCodeReg(getCurrent_uCode());
+
+/*
+    mSequencer->mCodeTable->insertByExpression("100:321:3:0:0: RIB1 Xs eRA");
+    mSequencer->mCodeTable->insertByExpression("110:321:3:0:0: RIB1 Xs eRB");
+    mSequencer->mCodeTable->insertByExpression("321:0:0:0:1: COB1 PLUS1 eCO");
+    mSequencer->mCodeTable->insertByExpression("322:0:0:0:1: COB1 PLUS1 eCO");
+*/
+    mRAM->setValue(0,1002560);
+    mRAM->setValue(1,1100128);
+    
+
+    refreshMicroCodeReg(0);
 
 }
 
@@ -261,16 +283,13 @@ CPU::calcNext_uCode(){
     //regs
     int microcode = getRegisterValue("Microcode");
     int Fetch = getRegisterValue("Fetch");
-    int OpCode = getRegisterValue("OpCode");
-    int Suiv = getRegisterValue("Suiv");
+    int OpCode = getRegisterValue("RI_OpCode");
+    int Suiv = mSequencer->MicrocodeReg->suiv;//getRegisterValue("Suiv");
 
     //Muxes
-    int Fin = getRegisterValue("Fin");
-    //std::cout << "FIN" << Fin << "\n";
-    int SeIMS =getRegisterValue("SeIMS");
+    int Fin = mSequencer->MicrocodeReg->Fin;//getRegisterValue("Fin");
+    int SeIMS =mSequencer->MicrocodeReg->SeIMS;//getRegisterValue("SeIMS");
     int RCond = getRegisterValue("RCond");
-
-  //  std::cout <<"ucode " << microcode << " Fetch " << Fetch << " OpCode " << OpCode <<" Suiv " <<Suiv << " Fin " <<Fin<< " SeIMS " << SeIMS << " RCond " << RCond << "\n";
 
     // algo
     int plus1 = microcode + 1;
@@ -295,7 +314,12 @@ CPU::refreshMicroCodeReg(int uCode){
     mSequencer->MicrocodeReg->uCode = uCode;
     mSequencer->MicrocodeReg->SeIMS = T->mSeIMS[uCode];
     mSequencer->MicrocodeReg->Cond = T->mCond[uCode];
+    /*std::cout << uCode << " : ";
+    for(int k=0;k<10;k++) {  std::cout << T->mSignals[uCode][k]<<" ";}
+    std::cout <<"    " << T->sigToCol["FIN"] << "\n";*/
+
     mSequencer->MicrocodeReg->Fin = T->mSignals[uCode][T->sigToCol["FIN"]]?1:0;
+
     int addrSuiv;
     sscanf(T->mAdrSuiv[uCode],"%d",&addrSuiv);
     mSequencer->MicrocodeReg->suiv = addrSuiv;
@@ -308,21 +332,34 @@ CPU::refreshMicroCodeReg(int uCode){
 void 
 CPU::runPhase(int uCode,bool illustrate){
 
+    refreshMicroCodeReg(uCode);
+
     setRegisterValue("SeIMS",mSequencer->MicrocodeReg->SeIMS);
-    setRegisterValue("Cond",mSequencer->MicrocodeReg->Cond);
     setRegisterValue("Fin",mSequencer->MicrocodeReg->Fin);
+    // eval conditions
+    int A,B,RCond = 0;
 
+    A = getRegisterValue("RA");     B = getRegisterValue("RB");
+    switch(mSequencer->MicrocodeReg->Cond) {
+        case 0 :
+            RCond = 0;
+            break;
+        case 1 : RCond = ((A==0)?1:0);
+            break;
+        case 2 : RCond = ((A==0)?1:0);
+            break;
+        case 3 : RCond = ((A>0)?1:0);
+            break;
+        case 4 : RCond = ((B>0)?1:0);
+            break;
+        case 5 : RCond = ((A%2==0)?1:0);
+            break;
+        case 6 : RCond = ((B%2==0)?1:0);
+            break;
 
-/*
-    MicrocodeTable* T = mSequencer->mCodeTable;
-    setRegisterValue("SeIMS",T->mSeIMS[uCode]);
-    setRegisterValue("Cond",T->mCond[uCode]);
-    int addrSuiv;
-    sscanf(T->mAdrSuiv[uCode],"%d",&addrSuiv);
-    //setRegisterValue("Suiv",addrSuiv);
-    mSequencer->MicrocodeReg->suiv = addrSuiv;
-    setRegisterValue("Fin",T->mSignals[uCode][T->sigToCol["FIN"]]?1:0);
-*/
+    }
+
+    setRegisterValue("RCond",RCond);
 
     std::string str= mSequencer->mCodeTable->signalsToString(uCode);
     std::vector < std::string > ordersList;
@@ -330,38 +367,17 @@ CPU::runPhase(int uCode,bool illustrate){
 
     executeArchiOrders(ordersList);
 
+
     if(illustrate){
         hiliteArchiOrders( ordersList,selected);
     }
 
+    setRegisterValue("RI_OpCode",mArchiCircuit->RI->getOpCodeValue());
+
     int newCode = calcNext_uCode();
     setRegisterValue("Microcode",newCode);
-    refreshMicroCodeReg(newCode);
-   /* mSequencer->MicrocodeReg->uCode = newCode;
-    mSequencer->MicrocodeReg->SeIMS = getRegisterValue("SeIMS");
-    mSequencer->MicrocodeReg->Fin = getRegisterValue("Fin");
-    mSequencer->MicrocodeReg->Cond = getRegisterValue("Cond");
-*/
-
- /* 
-
-class MicrocodeRegister: public IOBox {
-public :
-    MicrocodeRegister();
-    MicrocodeRegister(ImVec2 inPos);
-    virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
-    void  RebuildNodesCoords(IOBoxNodes& ioNodesList    );
-    virtual void     drawSingleValue(ImDrawList* dl,ImVec2 pos,int hoffset,std::string formatStr,std::string name,int value);
-    virtual void     drawOutputNodes(ImDrawList* dl,ImVec2 window_pos);
-
-    int uCode, suiv,SeIMS,Cond,Fin;
-    std::string ordres;
-};*/
-
-
-
-
-
+    
+  
 }
 
 
@@ -415,7 +431,7 @@ CPU::executeArchiOrders(const std::vector<std::string>& inOrders) {
         }    
     }
     // op
-    {
+    {   bool opExecuted = false;
         std::map<std::string, CombinatorialOperator::FunctionPtr>& ops = mArchiCircuit->OP->mOperations;
         CombinatorialOperator::FunctionPtr opFunc = nullptr;
         CombinatorialOperator* opReg = mArchiCircuit->OP;
@@ -426,7 +442,11 @@ CPU::executeArchiOrders(const std::vector<std::string>& inOrders) {
                 opFunc = ops[inOrders[k]];
                 Z = opFunc(X,Y);
                 sprintf(opReg->buf,"%s",inOrders[k].c_str());
+                opExecuted = true;
             }
+        }
+        if (opExecuted == false) {
+            sprintf(opReg->buf,"%s"," ");
         }
     }        
     // bus 3

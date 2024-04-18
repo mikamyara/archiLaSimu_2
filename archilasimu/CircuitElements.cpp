@@ -348,9 +348,7 @@ IOBox::drawName(ImDrawList* dl,ImVec2 window_pos) {
 
 
 ////---------------BasicRegister----------------
-BasicRegister::BasicRegister():IOBox("",0, {
-    0,0
-}) {}
+BasicRegister::BasicRegister():IOBox("",0, { 0,0}) {}
 
 BasicRegister::BasicRegister(std::string inName,ImU32 inColor,ImVec2 inPos,int textSize):IOBox(inName,inColor,inPos) {
     mTextBufSize = textSize +1; // a bit arbitrary
@@ -363,7 +361,7 @@ BasicRegister::BasicRegister(std::string inName,ImU32 inColor,ImVec2 inPos,int t
     mInputTextLabel = "##"+mName;
     mInputTextWidth = (mTextBufSize-1)*11;
     mInputTextVPos = 35;
-    minValue=0; maxValue=99999;
+    minValue=0; maxValue=9999999;
 }
 void
 BasicRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos) {
@@ -422,12 +420,11 @@ BasicRegister::filterValue(int val) const
 }
 
 
-////---------------RegisterBus123----------------
-RegisterBus123::RegisterBus123():BasicRegister("",0, {
-    0,0
-},5) {}
 
-RegisterBus123::RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos):BasicRegister(inName,inColor,inPos,5)
+////---------------RegisterBus123----------------
+RegisterBus123::RegisterBus123():BasicRegister("",0, {0,0},7) {}
+
+RegisterBus123::RegisterBus123(std::string inName,ImU32 inColor,ImVec2 inPos):BasicRegister(inName,inColor,inPos,7)
 {
     mRectSize = ImVec2(90,72);
     mWireLen = 55.0f;
@@ -653,18 +650,42 @@ InstructionRegister::drawName(ImDrawList* dl,ImVec2 window_pos) {
 
 void
 InstructionRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos) {
-    ImVec2 pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 15,mPos.y + window_pos.y + mRectPos.y + 55);
+    ImVec2 pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 7,mPos.y + window_pos.y + mRectPos.y + 55);
     ImGui::SetCursorPos (pos);
     ImGui::PushItemWidth(mInputTextWidth);
-    ImGui::InputText(mInputTextLabel.c_str(), buf, mTextBufSize,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::InputText(mInputTextLabel.c_str(), bufOpcode, 4,ImGuiInputTextFlags_CharsDecimal);
     ImGui::PopItemWidth();
-    pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 15,mPos.y + window_pos.y + mRectPos.y + 115);
+    pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 7,mPos.y + window_pos.y + mRectPos.y + 115);
     ImGui::SetCursorPos (pos);
     ImGui::PushItemWidth(mInputTextWidth);
-    ImGui::InputText(mFormaterInputTextLabel.c_str(), buf, mTextBufSize,ImGuiInputTextFlags_CharsDecimal);
+    ImGui::InputText(mFormaterInputTextLabel.c_str(), buf, 5,ImGuiInputTextFlags_CharsDecimal);
     ImGui::PopItemWidth();
 
 }
+int 
+InstructionRegister::setValue(int val) {
+    int ret = filterValue(val);
+ 
+    if(ret == 0 ) {
+        // fill opCode buffer
+        char localBuf[100];
+        sprintf(localBuf,"%d",val/10000);
+        memcpy(bufOpcode,localBuf,5);
+        // fill formater        
+        sprintf(localBuf,"%d",val%10000);
+        memcpy(buf,localBuf,5);
+        
+    }
+    return ret;
+}
+
+int 
+InstructionRegister::getOpCodeValue(){
+    int val;
+    sscanf(bufOpcode,"%d",&val);
+    return val;
+}
+
 
 
 void
@@ -873,7 +894,6 @@ MUX::draw(ImDrawList* dl, ImVec2 window_pos){
         thePos.x += window_pos.x + mWireLen+5; thePos.y += window_pos.y-10;
          sprintf(theBuf,"%d",k);
         addAlignedText(dl,thePos,eTextLeft, theBuf,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
-    
     }
 }
 

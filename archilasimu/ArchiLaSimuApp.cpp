@@ -39,6 +39,7 @@ ArchiLaSimuApp::customInit ()
     mExternalBus = new ExtBus();
     
     mRAM->mASM = mASM;
+    mASM->mRAM = mRAM;
 
     mCPU->mExternalBus = mExternalBus;
     mCPU->mRAM = mRAM;
@@ -85,10 +86,14 @@ ArchiLaSimuApp::drawMainWindow() {
     mRAM->drawWidgets(draw_list,window_pos);
     mExternalBus->draw(draw_list,scroll_pos);
 
+    ImVec2 titlePos = scroll_pos;
+    titlePos.x +=800;
+    titlePos.y +=750;
+    addAlignedText(draw_list,titlePos,eTextCenter, "Archi la simu - version Web",IM_COL32(255,255,255,120),gArchiTheme.mRobotoBoldFont,50) ;
 
 
    // ImGui::Text ("This is some useful text.");	// Display some text (you can use a format strings too)
-    ImGui::Checkbox ("Demo Window", &m_show_demo_window);	// Edit bools storing our window open/close state
+   // ImGui::Checkbox ("Demo Window", &m_show_demo_window);	// Edit bools storing our window open/close state
     //ImGui::Checkbox ("Another Window", &m_show_another_window);
 /*
     ImGui::SliderFloat ("float", &f, 0.0f, 1.0f);	// Edit 1 float using a slider from 0.0f to 1.0f

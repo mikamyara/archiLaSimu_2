@@ -1,7 +1,8 @@
 #pragma once
 #include <imgui.h>
-#include "Assembleur.h"
+#include <string>
 
+class Assembleur;
 class RAM {
 public:
     RAM();
@@ -9,7 +10,7 @@ public:
     void    drawWidgets(ImDrawList* dl, ImVec2 window_pos);
     int     getValue(int address);
     void    setValue(int address,int data);
-    
+    void    setRemark(int address, std::string remark);
 
 
     ImU32  mGlobalBackground,mSubPanelBackground,mBorderColor;

@@ -2,6 +2,7 @@
 #include <iostream>
 #include "ArchiTheme.h"
 #include <string.h>
+#include "Assembleur.h"
 
 RAM::RAM()  {
     mASM = nullptr;
@@ -131,8 +132,9 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
 int     
 RAM::getValue(int address) {
     if (address>=0 && address <mRows) {
-    int value;
-    ::sscanf(mData[address],"%d",&value);
+    int value=-1;
+    value = atoi(mData[address]);
+
     return value;
     }
     return -1;
@@ -144,4 +146,13 @@ RAM::setValue(int address,int data){
         ::sprintf(mData[address],"%d",data);
     }
 
+}
+
+
+void    
+RAM::setRemark(int address, std::string remark)
+{
+        if (address>=0 && address <mRows) {
+            ::sprintf(mHelpers[address],"%s",remark.c_str());
+        }
 }

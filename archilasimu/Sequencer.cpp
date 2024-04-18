@@ -35,21 +35,23 @@ Sequencer::Sequencer(CPU* inCPU) {
     Fetch      = new BasicRegister("Fetch",1, {235,105},3);
 
     reskinIOBox(Fetch);
-    Fin->minValue=0;   Fin->maxValue=501;
+    Fetch->minValue=0;   Fetch->maxValue=501;
     Fetch->mRectSize= {70,45};
     Fetch->mInputTextVPos=20;
     Fetch->mNameVPos = 0;
-    OpCode     = new BasicRegister("OpCode",1, {40,105},3);
 
+    OpCode     = new BasicRegister("RI_OpCode",1, {20,105},3);
     reskinIOBox(OpCode);
-    Fin->minValue=0;   Fin->maxValue=501;
-    OpCode->mRectSize= {70,45};
+    OpCode->minValue=0;   OpCode->maxValue=501;
+    OpCode->mRectSize= {100,45};
     OpCode->mInputTextVPos=20;
     OpCode->mNameVPos = 0;
+    OpCode->mColor = IM_COL32(75,0,75,255);
+
     Microcode  = new BasicRegister("Microcode",1, {430,57},3);
 
     reskinIOBox(Microcode);
-    Fin->minValue=0;   Fin->maxValue=501;
+    Microcode->minValue=0;   Microcode->maxValue=501;
 
     Microcode->mInputs.push_back(n=new Node());
     Microcode->mOutputs.mPosMode=e_Right;
@@ -175,6 +177,24 @@ Sequencer::draw(ImDrawList* dl, ImVec2 window_pos) {
     for(k=0; k<mBusses.size(); k++) {
         mBusses[k]->draw(dl,thePos);
     }
+
+    thePos.x +=430;
+    thePos.y+=130;
+    char theBuf[] = "Valeurs de Cond : ";
+    addAlignedText(dl,thePos,eTextCenter, theBuf,IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,20) ;
+    thePos.y+=18;
+    char theBuf1[] = "0:Aucun";
+    addAlignedText(dl,thePos,eTextCenter, theBuf1,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    thePos.y+=18;
+    char theBuf2[] = "1:A==0    2:B==0";
+    addAlignedText(dl,thePos,eTextCenter, theBuf2,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    thePos.y+=18;
+    char theBuf3[] = "3:A>0     4:B >0";
+    addAlignedText(dl,thePos,eTextCenter, theBuf3,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    thePos.y+=18;
+    char theBuf4[] = "5:A pair     6:B pair";
+    addAlignedText(dl,thePos,eTextCenter, theBuf4,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+
 }
 
 void

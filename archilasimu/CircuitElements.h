@@ -157,7 +157,13 @@ public:
     // virtual void draw(ImDrawList* dl, ImVec2 window_pos);
     virtual void drawName(ImDrawList* dl,ImVec2 window_pos);
     virtual void drawInputText(ImDrawList* dl,ImVec2 window_pos);
+    virtual int  setValue(int val); // sets overall value
+    virtual int  getOpCodeValue(); 
+   
+    
+
     std::string mFormaterInputTextLabel;
+    char bufOpcode[5];
 
 };
 
