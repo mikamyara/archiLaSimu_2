@@ -164,12 +164,12 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     pos.x +=500+140;
 
     ImGui::SetCursorPos (pos);    
-    if (ImGui::Button("   Charger Table   \n    Microcode"))
+    if (ImGui::Button("   Charger Table   \n      Microcode"))
     {
     }   
     pos.y +=50;
     ImGui::SetCursorPos (pos);         
-    if (ImGui::Button("Enregistrer Table\n     Microcode"))
+    if (ImGui::Button("Enregistrer Table\n       Microcode"))
     {
     }    
 
@@ -265,8 +265,8 @@ CPU::Reset() {
     mSequencer->mCodeTable->insertByExpression("321:0:0:0:1: COB1 PLUS1 eCO");
     mSequencer->mCodeTable->insertByExpression("322:0:0:0:1: COB1 PLUS1 eCO");
 */
-    mRAM->setValue(0,1002560);
-    mRAM->setValue(1,1100128);
+   // mRAM->setValue(0,1002560);
+   // mRAM->setValue(1,1100128);
     
 
     refreshMicroCodeReg(0);

@@ -1,7 +1,9 @@
 #include "ArchiTheme.h"
 #include <math.h>
 
-
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#include <GLFW/glfw3.h>
 
 ArchiTheme gArchiTheme;
 
@@ -135,6 +137,34 @@ ImU32 ArchiBusColor(const ImU32 inNormalColor,eSignalStatus inSignal){
    }
    return inNormalColor;
 }
+
+
+
+
+
+void LoadImage(const char* filename, GLuint* textureID, int* width, int* height) {
+    int channels;
+    unsigned char* image = stbi_load(filename, width, height, &channels, STBI_rgb_alpha);
+    if (!image) {
+        printf("Impossible de charger l'image : %s\n", filename);
+        return;
+    }
+
+    glGenTextures(1, textureID);
+    glBindTexture(GL_TEXTURE_2D, *textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, *width, *height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+    stbi_image_free(image);
+}
+
+
+
+
+
+
+
+
 
 /*
 

@@ -25,9 +25,9 @@ RAM::RAM()  {
     for(k=0; k<mCols; k++) {
         mColNames[k] = new char[30];
     }
-    strcpy(mColNames[0],"Adresse");
+    strcpy(mColNames[0],"Adresses");
     strcpy(mColNames[1],"Données");
-    strcpy(mColNames[2],"Remarque");
+    strcpy(mColNames[2],"Remarques");
 
 
 

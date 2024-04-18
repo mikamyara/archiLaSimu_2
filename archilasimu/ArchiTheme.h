@@ -4,6 +4,7 @@
 
 //#include "ArchiDescriptor.h"
 #include "CircuitElements.h"
+#include <GLFW/glfw3.h>
 
 
 
@@ -31,6 +32,8 @@ void TranslatePoints(ImVec2* points, int numPoints, ImVec2 translation);
 void RotatePoints(ImVec2* points, int numPoints, ImVec2 center, float angle);
 ImU32 ArchiBusColor(const ImU32 inNormalColor,eSignalStatus inSignal);
 
+
+void LoadImage(const char* filename, GLuint* textureID, int* width, int* height) ;
 
 
 extern ArchiTheme gArchiTheme;

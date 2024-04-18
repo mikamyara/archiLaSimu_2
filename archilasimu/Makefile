@@ -18,7 +18,7 @@ CXX = em++
 WEB_DIR = web
 EXE = $(WEB_DIR)/index.html
 IMGUI_DIR = ..
-SOURCES = main.cpp stringUtils.cpp imGuiApp.cpp ArchiLaSimuApp.cpp CircuitElements.cpp ArchiTheme.cpp ArchiCircuit.cpp CPU.cpp RAM.cpp Sequencer.cpp MicrocodeTable.cpp Assembleur.cpp
+SOURCES = main.cpp stringUtils.cpp imGuiApp.cpp ArchiLaSimuApp.cpp CircuitElements.cpp ArchiTheme.cpp ArchiCircuit.cpp CPU.cpp RAM.cpp Sequencer.cpp MicrocodeTable.cpp Assembleur.cpp APropos.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
@@ -49,7 +49,7 @@ LDFLAGS += -s NO_FILESYSTEM=1
 CPPFLAGS += -DIMGUI_DISABLE_FILE_FUNCTIONS
 endif
 ifeq ($(USE_FILE_SYSTEM), 1)
-LDFLAGS += --no-heap-copy --preload-file ../misc/fonts@/fonts
+LDFLAGS += --no-heap-copy --preload-file ../misc/fonts@/fonts --no-heap-copy  --preload-file  ../misc/imgs@/imgs
 endif
 
 ##---------------------------------------------------------------------

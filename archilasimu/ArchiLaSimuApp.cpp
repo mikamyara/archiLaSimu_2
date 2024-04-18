@@ -8,8 +8,9 @@
 #include <GLES2/gl2.h>
 #include <GL/glew.h>
 #include <stdio.h>
-
+#include "APropos.h"
 #include <iostream>
+
 
 
 ArchiLaSimuApp::ArchiLaSimuApp ():imGuiApp ()
@@ -47,6 +48,7 @@ ArchiLaSimuApp::customInit ()
     mCPU->Rebuild();
     mCPU->Reset();    
 
+    mAPropos = new APropos();
     return 0;
 }
 
@@ -90,10 +92,19 @@ ArchiLaSimuApp::drawMainWindow() {
     titlePos.x +=800;
     titlePos.y +=750;
     addAlignedText(draw_list,titlePos,eTextCenter, "Archi la simu - version Web",IM_COL32(255,255,255,120),gArchiTheme.mRobotoBoldFont,50) ;
+    ImVec2 aboutPos = window_pos;
+    aboutPos.x +=800;
+    aboutPos.y +=800;
+    ImGui::SetCursorPos(aboutPos);
+    ImGui::Checkbox ("A Propos de Archi la simu ...", &mAPropos->mShowMe);	// Edit bools storing our window open/close state
+    mAPropos->drawMe(draw_list,window_pos);
+    ImGui::SetCursorPos(ImVec2(0,0));
+    //ImGui::Image((void*)(intptr_t)logo_eea_tid, ImVec2(logo_eea_w, logo_eea_h));
+
 
 
    // ImGui::Text ("This is some useful text.");	// Display some text (you can use a format strings too)
-   // ImGui::Checkbox ("Demo Window", &m_show_demo_window);	// Edit bools storing our window open/close state
+  //  ImGui::Checkbox ("Demo Window", &m_show_demo_window);	// Edit bools storing our window open/close state
     //ImGui::Checkbox ("Another Window", &m_show_another_window);
 /*
     ImGui::SliderFloat ("float", &f, 0.0f, 1.0f);	// Edit 1 float using a slider from 0.0f to 1.0f

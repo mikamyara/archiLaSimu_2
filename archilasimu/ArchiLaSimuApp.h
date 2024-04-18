@@ -4,6 +4,7 @@
 #include "CPU.h"
 #include "RAM.h"
 #include "Assembleur.h"
+#include "APropos.h"
 
 class ArchiLaSimuApp : public imGuiApp {
 public :
@@ -27,5 +28,9 @@ public :
     RAM* mRAM;
     ExtBus* mExternalBus;
     Assembleur* mASM;
+
+
+    APropos* mAPropos;
+
 };
 

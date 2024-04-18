@@ -123,6 +123,7 @@ var REMOTE_PACKAGE_SIZE = metadata['remote_package_size'];
         if (!check) throw msg + new Error().stack;
       }
 Module['FS_createPath']("/", "fonts", true, true);
+Module['FS_createPath']("/", "imgs", true, true);
 
       /** @constructor */
       function DataRequest(start, end, audio) {
@@ -190,7 +191,7 @@ Module['FS_createPath']("/", "fonts", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/fonts/Cousine-Regular.ttf", "start": 0, "end": 43912}, {"filename": "/fonts/DroidSans.ttf", "start": 43912, "end": 233956}, {"filename": "/fonts/Karla-Regular.ttf", "start": 233956, "end": 250804}, {"filename": "/fonts/ProggyClean.ttf", "start": 250804, "end": 292012}, {"filename": "/fonts/ProggyTiny.ttf", "start": 292012, "end": 327668}, {"filename": "/fonts/Roboto-Bold.ttf", "start": 327668, "end": 463488}, {"filename": "/fonts/Roboto-Medium.ttf", "start": 463488, "end": 626076}, {"filename": "/fonts/Roboto-Regular.ttf", "start": 626076, "end": 771424}, {"filename": "/fonts/binary_to_compressed_c.cpp", "start": 771424, "end": 785216}], "remote_package_size": 785216});
+    loadPackage({"files": [{"filename": "/fonts/Cousine-Regular.ttf", "start": 0, "end": 43912}, {"filename": "/fonts/DroidSans.ttf", "start": 43912, "end": 233956}, {"filename": "/fonts/Karla-Regular.ttf", "start": 233956, "end": 250804}, {"filename": "/fonts/ProggyClean.ttf", "start": 250804, "end": 292012}, {"filename": "/fonts/ProggyTiny.ttf", "start": 292012, "end": 327668}, {"filename": "/fonts/Roboto-Bold.ttf", "start": 327668, "end": 463488}, {"filename": "/fonts/Roboto-Medium.ttf", "start": 463488, "end": 626076}, {"filename": "/fonts/Roboto-Regular.ttf", "start": 626076, "end": 771424}, {"filename": "/fonts/binary_to_compressed_c.cpp", "start": 771424, "end": 785216}, {"filename": "/imgs/logoEEA.png", "start": 785216, "end": 809259}, {"filename": "/imgs/logos.png", "start": 809259, "end": 898816}], "remote_package_size": 898816});
 
   })();
 
@@ -8740,9 +8741,9 @@ var wasmImports = {
 var wasmExports = createWasm();
 var ___wasm_call_ctors = createExportWrapper('__wasm_call_ctors');
 var _main = Module['_main'] = createExportWrapper('__main_argc_argv');
-var _fflush = Module['_fflush'] = createExportWrapper('fflush');
-var _malloc = createExportWrapper('malloc');
 var _free = createExportWrapper('free');
+var _malloc = createExportWrapper('malloc');
+var _fflush = Module['_fflush'] = createExportWrapper('fflush');
 var ___errno_location = createExportWrapper('__errno_location');
 var ___funcs_on_exit = createExportWrapper('__funcs_on_exit');
 var _emscripten_stack_init = () => (_emscripten_stack_init = wasmExports['emscripten_stack_init'])();
@@ -8755,6 +8756,7 @@ var stackAlloc = createExportWrapper('stackAlloc');
 var _emscripten_stack_get_current = () => (_emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'])();
 var ___cxa_is_pointer_type = createExportWrapper('__cxa_is_pointer_type');
 var dynCall_jiji = Module['dynCall_jiji'] = createExportWrapper('dynCall_jiji');
+var dynCall_viijii = Module['dynCall_viijii'] = createExportWrapper('dynCall_viijii');
 var dynCall_iiiiij = Module['dynCall_iiiiij'] = createExportWrapper('dynCall_iiiiij');
 var dynCall_iiiiijj = Module['dynCall_iiiiijj'] = createExportWrapper('dynCall_iiiiijj');
 var dynCall_iiiiiijj = Module['dynCall_iiiiiijj'] = createExportWrapper('dynCall_iiiiiijj');
