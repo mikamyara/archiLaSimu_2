@@ -5,6 +5,7 @@
 #include "ArchiCircuit.h"
 #include "Sequencer.h"
 #include "Assembleur.h"
+#include "CodeUploadDownload.h"
 
 class RAM;
 
@@ -38,5 +39,8 @@ public :
     ExtBus* mExternalBus;
     RAM*    mRAM;
     Assembleur* mASM;
+
+    MicrocodeFiles* mMicrocodeFiles;
+
 
 };

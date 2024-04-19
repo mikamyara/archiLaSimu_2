@@ -36,6 +36,7 @@ public:
                        std::vector < std::string > &result);
    // int signalToCol (std::string signal);
     std::string signalsToString(int row);
+    std::string exportExpression(int row);
     bool isOrderValid(std::string inOrder,bool includeMuxes=true);
 
     CPU *mCPU;

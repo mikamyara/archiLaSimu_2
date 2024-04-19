@@ -4,7 +4,6 @@
 #include <iostream>
 #include "stringUtils.h"
 #include "RAM.h"
-
 CPU::CPU() {
     //pinSize = ImVec2(8,4);
     mPos = ImVec2(450,10);
@@ -20,12 +19,16 @@ CPU::CPU() {
     mExternalBus = nullptr;
     mRAM = nullptr;
     mASM = nullptr;
+    mMicrocodeFiles = nullptr;
 
 }
 void
 CPU::Rebuild() {
     mArchiCircuit->Rebuild();
     mSequencer->Rebuild();
+    mMicrocodeFiles = new MicrocodeFiles();
+    mMicrocodeFiles->mTable = mSequencer->mCodeTable;    
+
 }
 
 void
@@ -111,7 +114,7 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
                 theLocalPos.y+=10;
                 ImGui::SetCursorPos(theLocalPos);
                 ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(60,150,60,255)); 
-                if (ImGui::Button("Exécuter une phase\n      du microcode"))
+                if (ImGui::Button("Exécuter une nouvelle\n phase du microcode"))
                 {
                 int code = getCurrent_uCode();
                 runPhase(code,selected);
@@ -130,7 +133,7 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
                 ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(60,150,60,255)); 
 
                 // Contenu de l'onglet 2
-                if (ImGui::Button(" Exécuter la prochaine\ninstruction assembleur"))
+                if (ImGui::Button(" Exécuter une nouvelle\ninstruction assembleur"))
                 {
                 }    
             ImGui::PopStyleColor();
@@ -165,12 +168,12 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
 
     ImGui::SetCursorPos (pos);    
     if (ImGui::Button("   Charger Table   \n      Microcode"))
-    {
+    {mMicrocodeFiles->Upload();
     }   
     pos.y +=50;
     ImGui::SetCursorPos (pos);         
     if (ImGui::Button("Enregistrer Table\n       Microcode"))
-    {
+    {mMicrocodeFiles->Download();
     }    
 
     pos = savePos;
@@ -324,7 +327,7 @@ CPU::refreshMicroCodeReg(int uCode){
     sscanf(T->mAdrSuiv[uCode],"%d",&addrSuiv);
     mSequencer->MicrocodeReg->suiv = addrSuiv;
 
-    mSequencer->MicrocodeReg->ordres = mSequencer->mCodeTable->signalsToString(uCode);
+    mSequencer->MicrocodeReg->ordres = mSequencer->mCodeTable->exportExpression(uCode);
     if(trim(mSequencer->MicrocodeReg->ordres) == "") {mSequencer->MicrocodeReg->ordres='-';}
 
 }

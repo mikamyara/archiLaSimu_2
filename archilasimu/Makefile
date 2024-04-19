@@ -18,13 +18,13 @@ CXX = em++
 WEB_DIR = web
 EXE = $(WEB_DIR)/index.html
 IMGUI_DIR = ..
-SOURCES = main.cpp stringUtils.cpp imGuiApp.cpp ArchiLaSimuApp.cpp CircuitElements.cpp ArchiTheme.cpp ArchiCircuit.cpp CPU.cpp RAM.cpp Sequencer.cpp MicrocodeTable.cpp Assembleur.cpp APropos.cpp
+SOURCES = main.cpp stringUtils.cpp imGuiApp.cpp ArchiLaSimuApp.cpp CircuitElements.cpp ArchiTheme.cpp ArchiCircuit.cpp CPU.cpp RAM.cpp Sequencer.cpp MicrocodeTable.cpp Assembleur.cpp APropos.cpp CodeUploadDownload.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 CPPFLAGS =
-LDFLAGS = 
+LDFLAGS = -sEXPORTED_FUNCTIONS=[_main,_malloc,_free] -sEXPORTED_RUNTIME_METHODS=[ccall] -sALLOW_MEMORY_GROWTH=1
 EMS =
 
 ##---------------------------------------------------------------------

@@ -15,8 +15,6 @@ public :
     GLuint CreateFramebuffer(int width,int height );
     void DrawTriangleInFramebuffer();
     void DrawFramebufferInImGui( );
-
-
     void drawMainWindow();
     void drawOtherWindow();
 

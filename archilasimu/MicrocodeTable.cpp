@@ -380,6 +380,21 @@ MicrocodeTable::signalsToString(int row) {
     return trim(s);
 }
 
+
+
+std::string 
+MicrocodeTable::exportExpression(int row){
+    std::string s = "";
+    s+= std::to_string(row)+":"+mAdrSuiv[row]+":";
+    s+=std::to_string(mSeIMS[row])+":"+std::to_string(mCond[row])+":";
+    s+=std::to_string(mSignals[row][sigToCol["FIN"]]?1:0)+":" ;
+    s+=signalsToString(row);
+
+    return s;    
+}
+
+
+
 bool
 MicrocodeTable::isOrderValid(std::string inOrder,bool includeMuxes) {
 
