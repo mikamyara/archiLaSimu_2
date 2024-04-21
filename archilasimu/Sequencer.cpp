@@ -35,14 +35,14 @@ Sequencer::Sequencer(CPU* inCPU) {
     Fetch      = new BasicRegister("Fetch",1, {235,105},3);
 
     reskinIOBox(Fetch);
-    Fetch->minValue=0;   Fetch->maxValue=501;
+    Fetch->minValue=0;   Fetch->maxValue=511;
     Fetch->mRectSize= {70,45};
     Fetch->mInputTextVPos=20;
     Fetch->mNameVPos = 0;
 
     OpCode     = new BasicRegister("RI_OpCode",1, {20,105},3);
     reskinIOBox(OpCode);
-    OpCode->minValue=0;   OpCode->maxValue=501;
+    OpCode->minValue=0;   OpCode->maxValue=511;
     OpCode->mRectSize= {100,45};
     OpCode->mInputTextVPos=20;
     OpCode->mNameVPos = 0;
@@ -51,7 +51,7 @@ Sequencer::Sequencer(CPU* inCPU) {
     Microcode  = new BasicRegister("Microcode",1, {430,57},3);
 
     reskinIOBox(Microcode);
-    Microcode->minValue=0;   Microcode->maxValue=501;
+    Microcode->minValue=0;   Microcode->maxValue=511;
 
     Microcode->mInputs.push_back(n=new Node());
     Microcode->mOutputs.mPosMode=e_Right;

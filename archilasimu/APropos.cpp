@@ -2,7 +2,7 @@
 #include "ArchiTheme.h"
 #include <iostream>
 APropos::APropos() {
-    mShowMe=false;
+    mShowMe=true;
 
     LoadImage("imgs/logos.png",&logo_eea_tid,&logo_eea_w,&logo_eea_h);
     std::cout << logo_eea_tid << "\n";
@@ -28,8 +28,8 @@ void  APropos::drawMe(ImDrawList* dl, ImVec2 window_pos){
     static bool firstOpen = true;
 
     if(firstOpen == true) {
-        ImGui::SetWindowSize(ImVec2(800,490));
-        ImGui::SetWindowPos(ImVec2(300,50));             
+        ImGui::SetWindowSize(ImVec2(800,650));
+        ImGui::SetWindowPos(ImVec2(300,10));             
         firstOpen = false;
     }
 
@@ -43,7 +43,8 @@ void  APropos::drawMe(ImDrawList* dl, ImVec2 window_pos){
     ImGui::Text("Logiciel à vocation pédagogique pour la simulation d'architecture de microprocesseurs");
     ImGui::SetCursorPos(ImVec2{300,110});
     ImGui::Text("Version 1.0 - Avril 2024");
-    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+    ImGui::Dummy(ImVec2(0.0f, 20.0f));
+
 
 
     ImGui::Text("Concept pédagogique : Arnaud VIRAZEL");
@@ -52,11 +53,47 @@ void  APropos::drawMe(ImDrawList* dl, ImVec2 window_pos){
     ImGui::Dummy(ImVec2(0.0f, 10.0f));
     ImGui::Text("Logiciel développé en C++ avec Emscripten (gcc/clang pour Webassembly) ");
     ImGui::Text("Bibliothèques graphiques : Dear ImGui 1.90.5 - GLFW - OpenGL 3 - stb_image");
-    ImGui::Dummy(ImVec2(0.0f, 10.0f));
+    ImGui::Dummy(ImVec2(0.0f, 20.0f));
+    ImGui::Image((void*)(intptr_t)logo_eea_tid, ImVec2(logo_eea_w, logo_eea_h));
+    ImGui::Dummy(ImVec2(0.0f, 20.0f));    
+    std::string text = "Que faut-il faire ?\n";
+    text+="Dans la sous-partie 'Séquenceur' se trouve la table des microcodes.Dans cette table, ";
+    text+="il faut indiquer les séquences de signaux à appliquer, phase par phase,pour chaque instruction assembleur reconnue"; 
+    text+="par le processeur.\n";
+    text+="Un exemple de séquence de signaux est rempli par défaut dans la table de microcode, au niveau des lignes 498 à 500.";
+    text+="Cette partie montre comment se déroule le cycle 'Fetch'.";
+    text+="Vous pouvez observer cette table de 2 façons : soit en regardant l'intégralité";
+    text+="des signaux cochés dans la vue 'Vue principale', soit en regardant juste les noms";
+    text+="des signaux utiles dans la 'Vue Synthétique'.";
+    text+="Chaque instruction assembleur correspond à un 'OpCode', qui est simplement la ligne de la table de microcode où elle débute.";
+    text+="On peut connaitre cet 'OpCode' en consultant la 'Table des Opcodes et Mnémoniques' intégrée au logiciel.";
+    text+="Par exemple, on peut y lire que LOAD_B immédiat est l'OpCode 110, et donc la séquence des signaux qui permettent de réaliser";
+    text+="cette instruction débutera à la ligne 110 dans la table des microcodes. Si l'instruction a besoin de plusieurs lignes, on pourra";
+    text+="continuer l'instruction après la ligne 321 de la table des microcodes. En effet, c'est à partir de la ligne 321 qu'un espace";
+    text+="libre conséquent est disponible.\n";
+    text+="Les signaux à piloter sont indiqués dans la partie 'Architecture' et dans la partie 'Séquenceur'\n";
+    text+="Une fois qu'une instruction est définie, on peut l'utiliser en la plaçant dans la RAM. On peut utiliser pour cela l'assistant proposé,";
+    text+="ou remplir soi même le code opération complet si on sait l'établir.\n";
+    text+="Une fois que l'on a fait tout cela, on peut tester ce que cela donne en exécutant phase par phase les microcodes pour voir l'évolution des signaux";
+    text+="pilotés par la table de microcode, et aussi vérifier que l'action voulue est bien réalisée pour les instructions qui ont été";
+    text+="décrites dans la table de microcode.";
+
+    
+
+
+    ImGui::TextWrapped("%s",text.c_str());
+
+
+
+   // ImGui::Text("Chaque instruction a un 'OpCode' qui correspond à la ligne à laquelle elle débute.");
+    
+   
+
+
+
     ImGui::PopFont();
 
 
-    ImGui::Image((void*)(intptr_t)logo_eea_tid, ImVec2(logo_eea_w, logo_eea_h));
     
     ImGui::End();
 }

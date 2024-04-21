@@ -12,7 +12,7 @@ void handle_upload_mic_file(std::string const &filename, std::string const &mime
  size_t debutLigne = 0;
     size_t finLigne = chaine.find_first_of("\n");
 
-    int numeroLigne = 1;
+    //int numeroLigne = 1;
 
     while (finLigne != std::string_view::npos) {
         std::string_view ligne = chaine.substr(debutLigne, finLigne - debutLigne);
@@ -23,7 +23,7 @@ void handle_upload_mic_file(std::string const &filename, std::string const &mime
         debutLigne = finLigne + 1;
         finLigne = chaine.find_first_of("\n", debutLigne);
 
-        numeroLigne++;
+      //  numeroLigne++;
     }
 
     // Gérer la dernière ligne

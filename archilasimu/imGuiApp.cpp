@@ -1,4 +1,9 @@
 #include "imGuiApp.h"
+#include <iostream>
+
+int imGuiApp::sFrameRate=0;
+
+#define EMSCRIPTEN_MAINLOOP_END_MM     ;     emscripten_set_main_loop(MainLoopForEmscripten, imGuiApp::sFrameRate, true);
 
 
 static void glfw_error_callback(int error, const char* description)
@@ -10,7 +15,16 @@ static void glfw_error_callback(int error, const char* description)
 imGuiApp::imGuiApp() {
     m_io = nullptr;
     m_window=nullptr;
+    mWindowTitle = "My Basic App";
+
 }
+
+
+EM_JS(void, set_canvas_size, (int width, int height), {
+    var canvas = document.getElementById("canvas");
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+});
 
 
 int
@@ -44,10 +58,11 @@ imGuiApp::Initialize() {
 #endif
 
     // Create window with graphics context
-    m_window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+OpenGL3 example", nullptr, nullptr);
+    m_window = glfwCreateWindow(1280, 720, mWindowTitle.c_str(), nullptr, nullptr);
     if (m_window == nullptr)
         return 1;
     glfwMakeContextCurrent(m_window);
+    // below : unuseful in the context of emscripten
     glfwSwapInterval(1); // Enable vsync
 
     // Setup Dear ImGui context
@@ -57,6 +72,18 @@ imGuiApp::Initialize() {
     (void)*m_io;
     m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+
+    // try hidpi : does not work.
+    /*std::cout << "FONT : " << m_io->FontGlobalScale<< "\n";
+    std::cout << m_io->DisplaySize.x << " "  << m_io->DisplaySize.y<<"\n" ;
+    std::cout << m_io->DisplayFramebufferScale.x << " " <<m_io->DisplayFramebufferScale.y << "\n";
+    m_io->DisplayFramebufferScale.x = 2;
+    m_io->DisplayFramebufferScale.y = 2;
+    m_io->DisplaySize.x = 800;
+    m_io->DisplaySize.y = 600;
+    m_io->FontGlobalScale = 0.5;
+    */
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -68,6 +95,48 @@ imGuiApp::Initialize() {
     ImGui_ImplGlfw_InstallEmscriptenCanvasResizeCallback("#canvas");
 #endif
     ImGui_ImplOpenGL3_Init(m_glsl_version.c_str());
+
+/*
+    int windowWidth, windowHeight;
+    int framebufferWidth, framebufferHeight;
+    glfwGetWindowSize(m_window, &windowWidth, &windowHeight);
+    std::cout << windowWidth<< " "<<windowHeight<<"\n";
+    glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  
+    std::cout << windowWidth<< " "<<windowHeight<< " " << framebufferWidth << " " <<framebufferHeight << "\n";
+
+    glfwSetWindowSize(
+        m_window, 
+        windowWidth * 2, 
+        windowHeight * 2
+    );
+
+        m_io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+        m_io->DisplaySize = ImVec2((float)windowWidth, (float)windowHeight);
+*/
+  /*  glViewport(
+        0, 
+        0, 
+        framebufferWidth * 2, 
+        framebufferHeight * 2
+    );
+    glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  */
+   // std::cout << windowWidth<< " "<<windowHeight<< " " << framebufferWidth << " " <<framebufferHeight << "\n";
+   // set_canvas_size(   windowWidth/2,     windowHeight/2);
+
+   /// glfwSetFramebufferSize(m_window, framebufferWidth*2, framebufferHeight*2);  
+
+    //float pixelRatio = static_cast<float>(framebufferWidth) / static_cast<float>(windowWidth);
+
+    // Configurer l'échelle de Dear ImGui pour HiDPI
+    //ImGui::GetIO().FontGlobalScale = pixelRatio;
+
+
+
+
+
+
+
+
 
     return 0;
 }
@@ -118,7 +187,8 @@ imGuiApp::Run()  {
         mainLoop();
     }
 #ifdef __EMSCRIPTEN__
-    EMSCRIPTEN_MAINLOOP_END;
+    EMSCRIPTEN_MAINLOOP_END_MM
+    //EMSCRIPTEN_MAINLOOP_END;
 #endif
 
     // Cleanup

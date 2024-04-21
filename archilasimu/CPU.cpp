@@ -247,8 +247,8 @@ CPU::Reset() {
     setRegisterValue("Fin",0);
     setRegisterValue("SeIMS",0);
     setRegisterValue("RI_OpCode",0);
-    setRegisterValue("Fetch",498);
-    setRegisterValue("Microcode",498);
+    setRegisterValue("Fetch",509);
+    setRegisterValue("Microcode",509);
 
     // ui related
     mArchiCircuit->mBus1->changeBusStatus(normal);
@@ -256,9 +256,9 @@ CPU::Reset() {
     mArchiCircuit->mBus3->changeBusStatus(normal);
 
     // add fetch
-    mSequencer->mCodeTable->insertByExpression ("498:000:0:0:0: COB1 XS eRAM");
-    mSequencer->mCodeTable->insertByExpression ("499:000:0:0:0: sM");
-    mSequencer->mCodeTable->insertByExpression ("500:000:2:0:0: REB1 XS eRI");
+    mSequencer->mCodeTable->insertByExpression ("509:000:0:0:0: COB1 XS eRAM");
+    mSequencer->mCodeTable->insertByExpression ("510:000:0:0:0: sM");
+    mSequencer->mCodeTable->insertByExpression ("511:000:2:0:0: REB1 XS eRI");
 
 
 
@@ -327,7 +327,7 @@ CPU::refreshMicroCodeReg(int uCode){
     sscanf(T->mAdrSuiv[uCode],"%d",&addrSuiv);
     mSequencer->MicrocodeReg->suiv = addrSuiv;
 
-    mSequencer->MicrocodeReg->ordres = mSequencer->mCodeTable->exportExpression(uCode);
+    mSequencer->MicrocodeReg->ordres = mSequencer->mCodeTable->signalsToString(uCode);
     if(trim(mSequencer->MicrocodeReg->ordres) == "") {mSequencer->MicrocodeReg->ordres='-';}
 
 }

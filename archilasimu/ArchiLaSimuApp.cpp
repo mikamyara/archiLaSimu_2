@@ -20,6 +20,9 @@ ArchiLaSimuApp::ArchiLaSimuApp ():imGuiApp ()
     m_show_another_window = false;
     m_clear_color = ImVec4 (0.45f, 0.55f, 0.60f, 1.00f);
 
+    imGuiApp::sFrameRate = 15;
+    mWindowTitle = "Archi La Simu - version Web";
+
 }
 
 int
@@ -49,6 +52,8 @@ ArchiLaSimuApp::customInit ()
     mCPU->Reset();    
 
     mAPropos = new APropos();
+std::cout << emscripten_get_device_pixel_ratio();
+
     return 0;
 }
 
@@ -115,8 +120,8 @@ ArchiLaSimuApp::drawMainWindow() {
     ImGui::SameLine ();
     ImGui::Text ("counter = %d", counter);
     ImGui::SetCursorPos (ImVec2 (500, 500));*/
-    //ImGui::Text ("Application average %.3f ms/frame (%.1f FPS)",
-    // 1000.0f / m_io->Framerate, m_io->Framerate);
+    ImGui::Text ("Application average %.3f ms/frame (%.1f FPS)",
+     1000.0f / m_io->Framerate, m_io->Framerate);
     ImGui::End ();
     ImGui::PopFont ();
 }

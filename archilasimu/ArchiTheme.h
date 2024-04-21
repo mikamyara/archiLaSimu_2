@@ -18,8 +18,10 @@ public:
     float mBusThickness;
 
 
-    ImFont *mRobotoFont=NULL,*mRobotoBoldFont=NULL;
+    ImFont *mRobotoFont=NULL,*mRobotoBoldFont=NULL;   
     void LoadFonts( ImGuiIO *in_io);
+
+    static int shidpiScale;
 };
 
 

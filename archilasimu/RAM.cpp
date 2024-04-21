@@ -9,7 +9,7 @@ RAM::RAM()  {
 
     int k;
     mCols=3;
-    mRows=100;
+    mRows=128;
 
     mData = new char*[mRows];
     mHelpers = new char*[mRows];

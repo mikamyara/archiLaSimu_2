@@ -1199,6 +1199,7 @@ function dbg(text) {
 // end include: runtime_debug.js
 // === Body ===
 
+function set_canvas_size(width,height) { var canvas = document.getElementById("canvas"); canvas.style.width = width + "px"; canvas.style.height = height + "px"; }
 function upload(accept_types,callback,callback_data) { globalThis["open_file"] = function(e) { const file_reader = new FileReader(); file_reader.onload = (event) => { const uint8Arr = new Uint8Array(event.target.result); const num_bytes = uint8Arr.length * uint8Arr.BYTES_PER_ELEMENT; const data_ptr = Module["_malloc"](num_bytes); const data_on_heap = new Uint8Array(Module["HEAPU8"].buffer, data_ptr, num_bytes); data_on_heap.set(uint8Arr); Module["ccall"]('upload_file_return', 'number', ['string', 'string', 'number', 'number', 'number', 'number'], [event.target.filename, event.target.mime_type, data_on_heap.byteOffset, uint8Arr.length, callback, callback_data]); Module["_free"](data_ptr); }; file_reader.filename = e.target.files[0].name; file_reader.mime_type = e.target.files[0].type; file_reader.readAsArrayBuffer(e.target.files[0]); }; var file_selector = document.createElement('input'); file_selector.setAttribute('type', 'file'); file_selector.setAttribute('onchange', 'globalThis["open_file"](event)'); file_selector.setAttribute('accept', UTF8ToString(accept_types)); file_selector.click(); }
 function download(filename,mime_type,buffer,buffer_size) { var a = document.createElement('a'); a.download = UTF8ToString(filename); a.href = URL.createObjectURL(new Blob([new Uint8Array(Module["HEAPU8"].buffer, buffer, buffer_size)], {type: UTF8ToString(mime_type)})); a.click(); }
 
@@ -4415,6 +4416,10 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
 
   var _abort = () => {
       abort('native code called abort()');
+    };
+
+  var _emscripten_get_device_pixel_ratio = () => {
+      return (typeof devicePixelRatio == 'number' && devicePixelRatio) || 1.0;
     };
 
   var withStackSave = (f) => {
@@ -8012,9 +8017,6 @@ function download(filename,mime_type,buffer,buffer_size) { var a = document.crea
 
   var _glfwGetWindowSize = (winid, width, height) => GLFW.getWindowSize(winid, width, height);
 
-  var _emscripten_get_device_pixel_ratio = () => {
-      return (typeof devicePixelRatio == 'number' && devicePixelRatio) || 1.0;
-    };
   
   
   
@@ -8621,6 +8623,8 @@ var wasmImports = {
   /** @export */
   download: download,
   /** @export */
+  emscripten_get_device_pixel_ratio: _emscripten_get_device_pixel_ratio,
+  /** @export */
   emscripten_get_element_css_size: _emscripten_get_element_css_size,
   /** @export */
   emscripten_memcpy_js: _emscripten_memcpy_js,
@@ -8836,8 +8840,8 @@ var dynCall_viijii = Module['dynCall_viijii'] = createExportWrapper('dynCall_vii
 var dynCall_iiiiij = Module['dynCall_iiiiij'] = createExportWrapper('dynCall_iiiiij');
 var dynCall_iiiiijj = Module['dynCall_iiiiijj'] = createExportWrapper('dynCall_iiiiijj');
 var dynCall_iiiiiijj = Module['dynCall_iiiiiijj'] = createExportWrapper('dynCall_iiiiiijj');
-var ___start_em_js = Module['___start_em_js'] = 245872;
-var ___stop_em_js = Module['___stop_em_js'] = 247320;
+var ___start_em_js = Module['___start_em_js'] = 247808;
+var ___stop_em_js = Module['___stop_em_js'] = 249407;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===

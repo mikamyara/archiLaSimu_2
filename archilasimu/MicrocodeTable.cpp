@@ -24,7 +24,7 @@ void
 MicrocodeTable::Rebuild ()
 {
 
-    mRows = 501;
+    mRows = 512;
 //## Step A : check column names
     std::vector < std::string > theColsList;
 // build a list of all signals to consider in the MicrocodeTable
@@ -420,7 +420,7 @@ MicrocodeTable::insertByExpression (std::string expr,bool updateShortView)
 
     bool ret =
         matchMicrocodeExpression (expr, code, suiv, SeIMS, Cond, Fin, orders);
-    if (ret == false || code > 500 || suiv > 500 || SeIMS > 3 || Cond >7)
+    if (ret == false || code > mRows || suiv > mRows || SeIMS > 3 || Cond >7)
         return false;
 
     for (int k = 0; k < orders.size (); k++)

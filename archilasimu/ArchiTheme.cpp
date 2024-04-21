@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 ArchiTheme gArchiTheme;
+int ArchiTheme::shidpiScale=1;
 
 
 ArchiTheme::ArchiTheme() {
@@ -22,7 +23,7 @@ ArchiTheme::ArchiTheme() {
     mMuxColor = IM_COL32(75,50,30,255);
     mMicrocodeBusColor = IM_COL32(00,200,255,255);
 
-    mBusThickness  = 4.0f;
+    mBusThickness  = 4.0f*ArchiTheme::shidpiScale;
 
     mRobotoFont=NULL;
     mRobotoBoldFont=NULL;
@@ -34,9 +35,9 @@ void
 ArchiTheme::LoadFonts( ImGuiIO *in_io) {
     in_io->Fonts->AddFontDefault ();
     mRobotoFont =
-        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Regular.ttf", 20.0f);
+        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Regular.ttf", shidpiScale*20.0f);
     mRobotoBoldFont =
-        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Bold.ttf", 50.0f);
+        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Bold.ttf", shidpiScale*50.0f);
 
 }
 

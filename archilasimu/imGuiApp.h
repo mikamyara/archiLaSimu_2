@@ -13,4 +13,9 @@ public:
     ImGuiIO* m_io;
     std::string m_glsl_version;
     GLFWwindow* m_window;
+
+    std::string mWindowTitle;
+
+    static int sFrameRate;
+
 };
