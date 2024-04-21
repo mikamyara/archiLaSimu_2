@@ -807,10 +807,10 @@ MicrocodeRegister::drawOutputNodes(ImDrawList* dl,ImVec2 window_pos) {
     ImU32 theColor;
     for(k=0; k<mOutputs.size(); k++) {
         if(k==0) {
-            theColor = gArchiTheme.mMicrocodeBusColor;
-        }
+            theColor = ArchiBusColor(gArchiTheme.mMicrocodeBusColor,mOutputs[k]->mStatus);  
+            }
         else {
-            theColor = gArchiTheme.mBoxWireColor;
+            theColor = ArchiBusColor(gArchiTheme.mBoxWireColor,mOutputs[k]->mStatus);
         }
         drawNode(dl,window_pos,mOutputs,k,theColor);
     }

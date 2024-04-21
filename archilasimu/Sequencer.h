@@ -7,6 +7,7 @@
 
 class CPU;
 
+
 class Sequencer {
 public :
     Sequencer(CPU* inCPU);
@@ -18,6 +19,7 @@ public :
 
     //virtual void     calcBus();
     virtual ~Sequencer();
+    void displayBusses(std::string str);
 
 
     BasicRegister *SeIMS,*Cond,*Fin;

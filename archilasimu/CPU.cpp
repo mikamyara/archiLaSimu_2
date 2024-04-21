@@ -273,6 +273,7 @@ CPU::Reset() {
     
 
     refreshMicroCodeReg(0);
+    mSequencer->displayBusses("CleanOnly");
 
 }
 
@@ -283,30 +284,47 @@ int CPU::getCurrent_uCode() {
 int  
 CPU::calcNext_uCode(){
 
-   // mSequencer->Microcode->mInputs[0]->mStatus = selected;
-
+ 
     //regs
     int microcode = getRegisterValue("Microcode");
     int Fetch = getRegisterValue("Fetch");
     int OpCode = getRegisterValue("RI_OpCode");
-    int Suiv = mSequencer->MicrocodeReg->suiv;//getRegisterValue("Suiv");
+    int Suiv = mSequencer->MicrocodeReg->suiv;
 
     //Muxes
-    int Fin = mSequencer->MicrocodeReg->Fin;//getRegisterValue("Fin");
-    int SeIMS =mSequencer->MicrocodeReg->SeIMS;//getRegisterValue("SeIMS");
+    int Fin = mSequencer->MicrocodeReg->Fin; 
+    int SeIMS =mSequencer->MicrocodeReg->SeIMS; 
     int RCond = getRegisterValue("RCond");
 
     // algo
     int plus1 = microcode + 1;
     
-    if(Fin==1) return Fetch;
+    if(Fin==1) { 
+        mSequencer->displayBusses("Fetch");
+        return Fetch;
+    }
     else { // Fin=0, so look at SeIMS 
-     if(SeIMS==0) return plus1;
-     if(SeIMS==2) return OpCode;
-     if(SeIMS==3) return Suiv;
+     if(SeIMS==0) {
+        mSequencer->displayBusses("Plus1Seims");
+        return plus1;
+     }
+     if(SeIMS==2) {
+        mSequencer->displayBusses("OpCode");
+        return OpCode;
+     }
+     if(SeIMS==3) {
+        mSequencer->displayBusses("Suiv");
+        return Suiv;
+     }
      if(SeIMS==1) { // SeIMS == 1 and Fin == 0, so look at cond
-        if(RCond==0) return plus1;
-        else return Suiv;
+        if(RCond==0)  {
+            mSequencer->displayBusses("Plus1Rcond");        
+            return plus1;
+        }
+        else {
+            mSequencer->displayBusses("SuivRcond");        
+            return Suiv;
+        }
        }
     }
 

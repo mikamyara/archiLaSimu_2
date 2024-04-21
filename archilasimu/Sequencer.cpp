@@ -3,6 +3,7 @@
 #include <iostream>
 
 
+
 Sequencer::Sequencer(CPU* inCPU) {
 
     mPos = {800,100};
@@ -10,22 +11,25 @@ Sequencer::Sequencer(CPU* inCPU) {
     Cond = nullptr;
     Fin= nullptr;
     Node* n;
-    SeIMS = new MUX("SeIMS",4, {150,35});
 
+    SeIMS = new MUX("SeIMS",4, {150,35});
     SeIMS->minValue=0;  SeIMS->maxValue=4;
     SeIMS->mInputTextVPos=35;
-    Cond = new MUX("RCond",2, {0,43});
+    SeIMS->mInputs[0]->mName = "SeIMS0";SeIMS->mInputs[1]->mName = "SeIMS1";SeIMS->mInputs[2]->mName = "SeIMS2";SeIMS->mInputs[3]->mName = "SeIMS3" ;   
 
+    Cond = new MUX("RCond",2, {0,43});
     Cond->minValue=0;   Cond->maxValue=1;
     Cond->mInputTextVPos=20;
     Cond->mNameVPos = 0;
-    Fin = new MUX("Fin",2, {290,57});
+    Cond->mInputs[0]->mName = "RCond0";Cond->mInputs[1]->mName = "RCond1";
 
+
+    Fin = new MUX("Fin",2, {290,57});
     Fin->minValue=0;   Fin->maxValue=1;
     Fin->mInputTextVPos=20;
     Fin->mNameVPos = 0;
-    Plus1 = new IOBox("PLUS1",0, {435,0});
 
+    Plus1 = new IOBox("PLUS1",0, {435,0});
     reskinIOBox(Plus1);
     Plus1->mRectSize= {90,35};
     Plus1->mInputs.mPosMode=e_Right;
@@ -210,4 +214,62 @@ Sequencer::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     themCodeVec.y+=312;
     themCodeVec.x+=12;
     mCodeTable->drawWidgets(dl,themCodeVec);
+}
+
+
+
+enum sequencerBuses {eMicrocodeOutput=0,ePlus1Input=1,ePlus1Output=2,eRCondOutput=3,eSeIMSOutput=4,eFinOutput=5,eOpcodeOutput=6,eFetchOutput=7,eMicroCodeReg=8};
+
+
+void
+Sequencer::displayBusses(std::string inStr) {
+    // first unselect everything
+    for(int k=0;k<mBusses.size();k++) {
+        mBusses[k]->changeBusStatus(normal);
+    }
+
+    if(inStr=="CleanOnly") return;
+    // select Microcode whatever happens 
+    Microcode->mOutputs[0]->mStatus = selected;
+    mBusses[eFinOutput]->changeBusStatus( selected);
+
+ //        mBusses[7]->changeBusStatus( selected);
+
+    if(inStr == "Fetch") {
+         mBusses[eFetchOutput]->changeBusStatus( selected);
+        return;
+    }
+    else {
+        // all other messages go through "Fin", so we
+        //enable it
+         mBusses[eSeIMSOutput]->changeBusStatus( selected);
+
+        if(inStr == "Plus1Seims") {
+            mBusses[ePlus1Input]->changeBusStatus(selected);
+            mBusses[ePlus1Output]->changePortionStatus("SeIMS0",selected);
+            return;
+        }
+        if(inStr == "OpCode") {
+            mBusses[eOpcodeOutput]->changeBusStatus(selected);
+            return;
+        }
+        if(inStr == "Suiv") {
+            mBusses[eMicroCodeReg]->changePortionStatus("SeIMS3",selected);
+            return;
+        }
+        // we made all cases but not SeIMS==1. So we start with it
+        mBusses[eRCondOutput]->changeBusStatus(selected);
+         if(inStr == "Plus1Rcond") {
+            mBusses[ePlus1Output]->changePortionStatus("RCond0",selected);
+            return;
+         }
+         if(inStr=="SuivRcond") {
+            mBusses[eMicroCodeReg]->changePortionStatus("RCond1",selected);
+            return;
+         }
+
+    }
+
+   // mSequencer->MicrocodeReg->mOutputs[1]->mStatus = selected;   
+
 }
