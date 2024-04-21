@@ -4,6 +4,7 @@
 #include <iostream>
 #include "stringUtils.h"
 #include "RAM.h"
+#include "imGuiApp.h"
 CPU::CPU() {
     //pinSize = ImVec2(8,4);
     mPos = ImVec2(450,10);
@@ -33,7 +34,6 @@ CPU::Rebuild() {
 
 void
 CPU::draw(ImDrawList* dl, ImVec2 window_pos) {
-
     ImVec2 P1global,P2global,P1arch,P2arch,P1seq,P2seq,P1act,P2act;
     ImVec2 thePos = ImVec2(mPos.x + window_pos.x, mPos.y + window_pos.y);
     P1global.x = thePos.x + mRectPos.x;
@@ -64,26 +64,26 @@ CPU::draw(ImDrawList* dl, ImVec2 window_pos) {
     
 
 
-    dl->AddRectFilled (P1global, P2global, mGlobalBackground);
-    dl->AddRect(P1global, P2global, mBorderColor, 0.0f, ImDrawFlags_None, 4.0f);
+    dl->AddRectFilled (toHD(P1global), toHD(P2global), mGlobalBackground);
+    dl->AddRect(toHD(P1global), toHD(P2global), mBorderColor, 0.0f, ImDrawFlags_None, 4.0f);
 
-    dl->AddRectFilled (P1act, P2act, mSubPanelBackground);
-    dl->AddRect(P1act, P2act, mBorderColor, 0.0f, ImDrawFlags_None, 0.5f);
+    dl->AddRectFilled (toHD(P1act), toHD(P2act), mSubPanelBackground);
+    dl->AddRect(toHD(P1act), toHD(P2act), toHD(mBorderColor), 0.0f, ImDrawFlags_None, 0.5f);
 
-    dl->AddRectFilled (P1arch, P2arch, mSubPanelBackground);
-    dl->AddRect(P1arch, P2arch, mBorderColor, 0.0f, ImDrawFlags_None, 0.5f);
+    dl->AddRectFilled (toHD(P1arch), toHD(P2arch), mSubPanelBackground);
+    dl->AddRect(toHD(P1arch), toHD(P2arch), mBorderColor, 0.0f, ImDrawFlags_None, 0.5f);
 
-    dl->AddRectFilled (P1seq, P2seq, mSubPanelBackground);
-    dl->AddRect(P1seq, P2seq, mBorderColor, 0.0f, ImDrawFlags_None, 0.5f);
+    dl->AddRectFilled (toHD(P1seq), toHD(P2seq), mSubPanelBackground);
+    dl->AddRect(toHD(P1seq), toHD(P2seq), mBorderColor, 0.0f, ImDrawFlags_None, 0.5f);
 
     ImVec2 theCPUNamePos = ImVec2( (P1global.x + P2global.x)/2,thePos.y+10 );
-    addAlignedText(dl,theCPUNamePos,eTextCenter,"CPU",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,48);
+    addAlignedText(dl,toHD(theCPUNamePos),eTextCenter,"CPU",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,toHD(48));
 
     ImVec2 theArchiNamePos = ImVec2((P1arch.x + P2arch.x)/2,P1arch.y+3);
-    addAlignedText(dl,theArchiNamePos,eTextCenter,"Architecture",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,35);
+    addAlignedText(dl,toHD(theArchiNamePos),eTextCenter,"Architecture",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,toHD(35));
 
     ImVec2 theSequenserNamePos = ImVec2((P1seq.x + P2seq.x)/2-40,P1seq.y+3);
-    addAlignedText(dl,theSequenserNamePos,eTextCenter,"Séquenceur",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,35);
+    addAlignedText(dl,toHD(theSequenserNamePos),eTextCenter,"Séquenceur",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,toHD(35));
 
     mASM->drawMnemonicsWindow(dl,thePos);
     mArchiCircuit->draw(dl,thePos);
@@ -100,19 +100,19 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     pos = savePos;
     pos.x  +=17 ;    pos.y +=77;
 
-    ImGui::SetCursorPos (pos);
+    ImGui::SetCursorPos (toHD(pos));
 
     ImGui::PushStyleVar (ImGuiStyleVar_ChildBorderSize, 0);	// Ajustez la taille de la bordure ici
-    ImGui::BeginChild ("Commandes CPU", ImVec2 (460, 125), true);
+    ImGui::BeginChild ("Commandes CPU", toHD(ImVec2 (460, 125)), true);
     ImGui::PopStyleVar ();
 
     if (ImGui::BeginTabBar ("ASM ou Phase")) {
 
             if (ImGui::BeginTabItem ("Microcode Phase par Phase"))
-            {   ImVec2 theLocalPos =ImGui::GetCursorPos();
+            {   ImVec2 theLocalPos =toLD(ImGui::GetCursorPos());
                 theLocalPos.x+=50;
                 theLocalPos.y+=10;
-                ImGui::SetCursorPos(theLocalPos);
+                ImGui::SetCursorPos(toHD(theLocalPos));
                 ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(60,150,60,255)); 
                 if (ImGui::Button("Exécuter une nouvelle\n phase du microcode"))
                 {
@@ -126,10 +126,10 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
             }
 
             if (ImGui::BeginTabItem ("Assembleur Pas à Pas"))
-            { ImVec2 theLocalPos =ImGui::GetCursorPos();
+            { ImVec2 theLocalPos = toLD(ImGui::GetCursorPos());
                 theLocalPos.x+=50;
                 theLocalPos.y+=10;
-                ImGui::SetCursorPos(theLocalPos);
+                ImGui::SetCursorPos(toHD(theLocalPos));
                 ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(60,150,60,255)); 
 
                 // Contenu de l'onglet 2
@@ -151,14 +151,14 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     pos.y +=93;
     pos.x +=485;
 
-    ImGui::SetCursorPos (pos);
+    ImGui::SetCursorPos (toHD(pos));
     //ImGui::PushItemWidth(mInputTextWidth);
     if (ImGui::Button("            Reset\n              CPU              "))
     {
         Reset();
     }
     pos.y +=55;
-    ImGui::SetCursorPos (pos);
+    ImGui::SetCursorPos (toHD(pos));
 
     ImGui::Checkbox("Table Opcodes\net Mnémoniques", &mASM->mShowMnemonicsTable);
 
@@ -166,12 +166,12 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     pos.y +=93;
     pos.x +=500+140;
 
-    ImGui::SetCursorPos (pos);    
+    ImGui::SetCursorPos (toHD(pos));    
     if (ImGui::Button("   Charger Table   \n      Microcode"))
     {mMicrocodeFiles->Upload();
     }   
     pos.y +=50;
-    ImGui::SetCursorPos (pos);         
+    ImGui::SetCursorPos (toHD(pos));         
     if (ImGui::Button("Enregistrer Table\n       Microcode"))
     {mMicrocodeFiles->Download();
     }    
@@ -282,6 +282,8 @@ int CPU::getCurrent_uCode() {
 
 int  
 CPU::calcNext_uCode(){
+
+   // mSequencer->Microcode->mInputs[0]->mStatus = selected;
 
     //regs
     int microcode = getRegisterValue("Microcode");

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string.h>
 #include <regex>
+#include "imGuiApp.h"
 
 OpDesc::OpDesc() {
     RegList = nullptr;
@@ -234,15 +235,15 @@ Assembleur::drawMnemonicsWindow(ImDrawList* dl, ImVec2 window_pos){
         static bool firstOpen = true;
 
         if(firstOpen == true) {
-            ImGui::SetWindowSize(ImVec2(300,500));
-            ImGui::SetWindowPos(ImVec2(315,265));             
+            ImGui::SetWindowSize(toHD(ImVec2(300,500)));
+            ImGui::SetWindowPos(toHD(ImVec2(315,265)));             
             firstOpen = false;
         }
         //ImGui::SetCursorPos (pos);
         ImVec2 size = ImGui::GetWindowSize();
         size.x-=16;
         size.y-=50;
-        if (ImGui::BeginTable("table_Opcodes", mCols, table_flags, size))
+        if (ImGui::BeginTable("table_Opcodes", mCols, table_flags, toHD(size)))
         {
 
             //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
@@ -279,11 +280,11 @@ Assembleur::drawMnemonicsWindow(ImDrawList* dl, ImVec2 window_pos){
                                 strcpy(adrModeStr,parts[1].c_str());}
                        }
                         if(column == 1) {
-                            ImGui::PushItemWidth(70);
+                            ImGui::PushItemWidth(toHD(70));
                             ImGui::Text("%s",opCodeStr);
                             ImGui::PopItemWidth();
                         } else {
-                            ImGui::PushItemWidth(140);
+                            ImGui::PushItemWidth(toHD(140));
                             ImGui::Text("%s",adrModeStr);
                             ImGui::PopItemWidth();
 
@@ -318,13 +319,13 @@ Assembleur::drawOpcodeBuilderWindow(ImDrawList* dl, ImVec2 window_pos){
         static bool firstOpen = true;
 
         if(firstOpen == true) {
-            ImGui::SetWindowPos(ImVec2(315,10));             
-            ImGui::SetWindowSize(ImVec2(600,245)); 
+            ImGui::SetWindowPos(toHD(ImVec2(315,10)));             
+            ImGui::SetWindowSize(toHD(ImVec2(600,245))); 
             firstOpen = false;
         }
 
 
-        ImGui::PushItemWidth(100);
+        ImGui::PushItemWidth(toHD(100));
             ImGui::Text("Adresse où écrire l'instruction :");
             static char bufAdr[4]={0};
             ImGui::InputText("##C5",bufAdr,4,ImGuiInputTextFlags_CharsDecimal);
@@ -433,8 +434,8 @@ Assembleur::drawOpcodeBuilderWindow(ImDrawList* dl, ImVec2 window_pos){
             ImGui::Spacing();
 
             float buttonWidth = 150.0f; // Largeur du bouton
-            ImGui::SetCursorPosX(ImGui::GetWindowWidth() - buttonWidth-10); // Alignement à droite
-            if (ImGui::Button("Ecrire l'instruction\n          en RAM", ImVec2(buttonWidth, 0))) {
+            ImGui::SetCursorPosX(toHD(toLD(ImGui::GetWindowWidth()) - buttonWidth-10)); // Alignement à droite
+            if (ImGui::Button("Ecrire l'instruction\n          en RAM", toHD(ImVec2(buttonWidth, 0)))) {
                 mRAM->setValue(theAdress,theInstruction);
                 mRAM->setRemark(theAdress,fullOp);
               }

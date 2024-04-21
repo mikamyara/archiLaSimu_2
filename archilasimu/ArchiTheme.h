@@ -5,6 +5,7 @@
 //#include "ArchiDescriptor.h"
 #include "CircuitElements.h"
 #include <GLFW/glfw3.h>
+#include "imGuiApp.h"
 
 
 
@@ -21,7 +22,6 @@ public:
     ImFont *mRobotoFont=NULL,*mRobotoBoldFont=NULL;   
     void LoadFonts( ImGuiIO *in_io);
 
-    static int shidpiScale;
 };
 
 

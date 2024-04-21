@@ -6,7 +6,6 @@
 #include <GLFW/glfw3.h>
 
 ArchiTheme gArchiTheme;
-int ArchiTheme::shidpiScale=1;
 
 
 ArchiTheme::ArchiTheme() {
@@ -23,7 +22,7 @@ ArchiTheme::ArchiTheme() {
     mMuxColor = IM_COL32(75,50,30,255);
     mMicrocodeBusColor = IM_COL32(00,200,255,255);
 
-    mBusThickness  = 4.0f*ArchiTheme::shidpiScale;
+    mBusThickness  = 4.0f;
 
     mRobotoFont=NULL;
     mRobotoBoldFont=NULL;
@@ -34,10 +33,17 @@ ArchiTheme::ArchiTheme() {
 void
 ArchiTheme::LoadFonts( ImGuiIO *in_io) {
     in_io->Fonts->AddFontDefault ();
+ ImFontConfig font_config;
+    font_config.OversampleH = 4;  // Pour une meilleure qualité horizontale
+    font_config.OversampleV = 4;  // Pour une meilleure qualité verticale
+    font_config.PixelSnapH = false; // Pour aligner les pixels horizontalement
+    font_config.MergeMode = false; // Fusionner avec une autre police
+    font_config.GlyphExtraSpacing = ImVec2(0, 0); // Espace supplémentaire entre les glyphes
+
     mRobotoFont =
-        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Regular.ttf", shidpiScale*20.0f);
+        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Regular.ttf", imGuiApp::shidpiScale*20.0f,&font_config);
     mRobotoBoldFont =
-        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Bold.ttf", shidpiScale*50.0f);
+        in_io->Fonts->AddFontFromFileTTF ("/fonts/Roboto-Bold.ttf", imGuiApp::shidpiScale*50.0f,&font_config);
 
 }
 

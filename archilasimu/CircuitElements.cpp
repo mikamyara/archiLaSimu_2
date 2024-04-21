@@ -70,14 +70,14 @@ Node::drawWires(ImDrawList* dl,ImU32 inBusColor,float inThickness,ImVec2 inAbsPo
             ImVec2 P1,P2;
             P1 =  ImVec2( (int)(inAbsPos.x + mLocalPos.x),(int)(inAbsPos.y + mLocalPos.y) );
             P2 =  ImVec2( (int)(inAbsPos.x + destNode->mLocalPos.x),(int)(inAbsPos.y + destNode->mLocalPos.y));
-            dl->AddCircleFilled(P1,((int)inThickness)/2,theColor);
-            dl->AddLine(P1, P2, theColor, inThickness);
-            dl->AddCircleFilled(P2,((int)inThickness)/2,theColor);
+            dl->AddCircleFilled(toHD(P1),toHD(((int)inThickness)/2),theColor);
+            dl->AddLine(toHD(P1), toHD(P2), theColor, toHD(inThickness));
+            dl->AddCircleFilled(toHD(P2),toHD(((int)inThickness)/2),theColor);
 
             if(mWires[k]->mArrowed) {
                 ImVec2 Point((P1.x+P2.x)/2,(P1.y+P2.y)/2);
                 float angle = std::atan2(P2.y-P1.y,P2.x-P1.x);
-                drawOrientedTriangle(dl,Point, 15, angle*180/3.14159,theColor) ;
+                drawOrientedTriangle(dl,toHD(Point), toHD(15), angle*180/3.14159,theColor) ;
             }
             destNode->drawWires(dl,inBusColor,inThickness,inAbsPos);
         }
@@ -308,7 +308,7 @@ IOBox::drawNode(ImDrawList* dl,ImVec2 window_pos,const IOBoxNodes& theNodes,int 
 
     ImVec2 P1,P2;
     calcWirePosition(window_pos,theNodes,num,P1,P2);
-    dl->AddLine(P1, P2, inBusColor, gArchiTheme.mBusThickness);
+    dl->AddLine(toHD(P1), toHD(P2), inBusColor, toHD(gArchiTheme.mBusThickness));
 }
 
 void
@@ -327,8 +327,8 @@ IOBox::drawBox(ImDrawList* dl,ImVec2 window_pos) {
 
     thePosMin = ImVec2(window_pos.x + mPos.x + mRectPos.x, window_pos.y + mPos.y + mRectPos.y );
     thePosMax = ImVec2 (thePosMin.x + mRectSize.x, thePosMin.y + mRectSize.y);
-    dl->AddRect(thePosMin, thePosMax, mBorderColor, 0.0f, ImDrawFlags_None, 6.0f);
-    dl->AddRectFilled (thePosMin, thePosMax, mColor);
+    dl->AddRect(toHD(thePosMin), toHD(thePosMax), mBorderColor, 0.0f, ImDrawFlags_None, toHD(6.0f));
+    dl->AddRectFilled (toHD(thePosMin), toHD(thePosMax), mColor);
 }
 
 
@@ -340,7 +340,7 @@ IOBox::drawName(ImDrawList* dl,ImVec2 window_pos) {
     ImVec2 pos;
         pos = ImVec2(mPos.x+window_pos.x+mRectPos.x+mRectSize.x/2,mPos.y+window_pos.y+mRectPos.y+mNameVPos);
     for(int k=0;k<parts.size();k++) {
-        addAlignedText(dl,pos,eTextCenter,parts[k].c_str(),mNameColor,gArchiTheme.mRobotoBoldFont,24);
+        addAlignedText(dl,toHD(pos),eTextCenter,parts[k].c_str(),mNameColor,gArchiTheme.mRobotoBoldFont,toHD(24));
         pos.y+=18;
     }
 }
@@ -367,8 +367,8 @@ void
 BasicRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos) {
 
     ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + mInputTextVPos);
-    ImGui::SetCursorPos (labelPos);
-    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::SetCursorPos (toHD(labelPos));
+    ImGui::PushItemWidth(toHD(mInputTextWidth));
     ImGui::InputText(mInputTextLabel.c_str(), buf, mTextBufSize,ImGuiInputTextFlags_CharsDecimal);
     ImGui::PopItemWidth();
 }
@@ -500,7 +500,7 @@ RegisterBus123::drawLabels(ImDrawList* dl,ImVec2 window_pos) {
         C.x = (P1.x + P2.x)/2 ;
         C.y = (P1.y + P2.y)/2;
         ImU32 theColor = ArchiBusColor( gArchiTheme.mBus3Color,mBus3Node->mStatus);
-        dl->AddCircleFilled(C,5,theColor);
+        dl->AddCircleFilled(toHD(C),toHD(5),theColor);
         if(mInputs.mPosMode == e_Left) {
             C.y-=25;
             mode =eTextCenter;
@@ -510,7 +510,7 @@ RegisterBus123::drawLabels(ImDrawList* dl,ImVec2 window_pos) {
             C.y-=10;
             mode=eTextLeft;
         }
-        addAlignedText(dl,C,mode,mInputs[0]->mName.c_str(),gArchiTheme.mBus3Color,gArchiTheme.mRobotoBoldFont,20);
+        addAlignedText(dl,toHD(C),mode,mInputs[0]->mName.c_str(),gArchiTheme.mBus3Color,gArchiTheme.mRobotoBoldFont,toHD(20));
     }
 
 
@@ -520,10 +520,10 @@ RegisterBus123::drawLabels(ImDrawList* dl,ImVec2 window_pos) {
         C.x = (P1.x + P2.x)/2 ;
         C.y = (P1.y + P2.y)/2;
         ImU32 theColor = ArchiBusColor(gArchiTheme.mRegisterOutputCircleColor,mBus1Node->mStatus);
-        dl->AddCircleFilled(C,8,theColor);
-        dl->AddCircle(C,8,gArchiTheme.mBus1Color,12,2);
+        dl->AddCircleFilled(toHD(C),toHD(8),theColor);
+        dl->AddCircle(toHD(C),toHD(8),gArchiTheme.mBus1Color,12,2);
         C.y+=8;
-        addAlignedText(dl,C,eTextCenter,mOutputs[1]->mName.c_str(),gArchiTheme.mBus1Color,gArchiTheme.mRobotoBoldFont,20);
+        addAlignedText(dl,toHD(C),eTextCenter,mOutputs[1]->mName.c_str(),gArchiTheme.mBus1Color,gArchiTheme.mRobotoBoldFont,toHD(20));
     }
 
     // Bus 2
@@ -532,10 +532,10 @@ RegisterBus123::drawLabels(ImDrawList* dl,ImVec2 window_pos) {
         C.x = (P1.x + P2.x)/2 ;
         C.y = (P1.y + P2.y)/2;
         ImU32 theColor = ArchiBusColor(gArchiTheme.mRegisterOutputCircleColor,mBus2Node->mStatus);
-        dl->AddCircleFilled(C,8,theColor);
-        dl->AddCircle(C,8,gArchiTheme.mBus2Color,12,2);
+        dl->AddCircleFilled(toHD(C),toHD(8),theColor);
+        dl->AddCircle(toHD(C),toHD(8),gArchiTheme.mBus2Color,12,2);
         C.y-=27;
-        addAlignedText(dl,C,eTextCenter,mOutputs[0]->mName.c_str(),gArchiTheme.mBus2Color,gArchiTheme.mRobotoBoldFont,20);
+        addAlignedText(dl,toHD(C),eTextCenter,mOutputs[0]->mName.c_str(),gArchiTheme.mBus2Color,gArchiTheme.mRobotoBoldFont,toHD(20));
     }
 
 }
@@ -571,16 +571,16 @@ void
 CombinatorialOperator::drawName(ImDrawList* dl,ImVec2 window_pos) {
     ImVec2 pos;
     pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + mBus1Node->mPos.x,mPos.y + window_pos.y + mRectPos.y + 5);
-    addAlignedText(dl,pos,eTextCenter,"X",mNameColor,gArchiTheme.mRobotoBoldFont,24);
+    addAlignedText(dl,toHD(pos),eTextCenter,"X",mNameColor,gArchiTheme.mRobotoBoldFont,toHD(24));
     pos.x = mPos.x + window_pos.x + mRectPos.x + mBus2Node->mPos.x;
-    addAlignedText(dl,pos,eTextCenter,"Y",mNameColor,gArchiTheme.mRobotoBoldFont,24);
+    addAlignedText(dl,toHD(pos),eTextCenter,"Y",mNameColor,gArchiTheme.mRobotoBoldFont,toHD(24));
 
 
 
     pos = ImVec2(mPos.x+window_pos.x+mRectPos.x+mRectSize.x/2,mPos.y+window_pos.y+mRectPos.y+mRectSize.y-50);
-    addAlignedText(dl,pos,eTextCenter,"Opérateur",mNameColor,gArchiTheme.mRobotoBoldFont,21);
+    addAlignedText(dl,toHD(pos),eTextCenter,"Opérateur",mNameColor,gArchiTheme.mRobotoBoldFont,toHD(21));
     pos.y+=23;
-    addAlignedText(dl,pos,eTextCenter,"Combinatoire",mNameColor,gArchiTheme.mRobotoBoldFont,21);
+    addAlignedText(dl,toHD(pos),eTextCenter,"Combinatoire",mNameColor,gArchiTheme.mRobotoBoldFont,toHD(21));
 
 }
 
@@ -590,8 +590,8 @@ void
 CombinatorialOperator::drawInputText(ImDrawList* dl,ImVec2 window_pos) {
 
     ImVec2 labelPos = ImVec2(mPos.x + window_pos.x + mRectPos.x + (mRectSize.x - mInputTextWidth)/2,mPos.y + window_pos.y + mRectPos.y + 35);
-    ImGui::SetCursorPos (labelPos);
-    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::SetCursorPos (toHD(labelPos));
+    ImGui::PushItemWidth(toHD(mInputTextWidth));
     ImGui::InputText(mInputTextLabel.c_str(), buf, mTextBufSize);
     ImGui::PopItemWidth();
 
@@ -639,25 +639,25 @@ InstructionRegister::drawName(ImDrawList* dl,ImVec2 window_pos) {
 
     ImVec2 thePosMin = ImVec2(window_pos.x + mPos.x + mRectPos.x, window_pos.y + mPos.y + mRectPos.y+90);
     ImVec2 thePosMax = ImVec2 (thePosMin.x + mRectSize.x, thePosMin.y + mRectSize.y-90);
-    dl->AddRectFilled (thePosMin, thePosMax, IM_COL32(0,0,0,80));
+    dl->AddRectFilled (toHD(thePosMin), toHD(thePosMax), IM_COL32(0,0,0,80));
 
     RegisterBus123::drawName(dl,window_pos);
     ImVec2 pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + mRectSize.x/2,mPos.y + window_pos.y + mRectPos.y + 35);
-    addAlignedText(dl,pos,eTextCenter,"OPCode",mNameColor,gArchiTheme.mRobotoFont,20);
+    addAlignedText(dl,toHD(pos),eTextCenter,"OPCode",mNameColor,gArchiTheme.mRobotoFont,toHD(20));
     pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + mRectSize.x/2,mPos.y + window_pos.y + mRectPos.y + 95);
-    addAlignedText(dl,pos,eTextCenter,"Formatteur",mNameColor,gArchiTheme.mRobotoFont,20);
+    addAlignedText(dl,toHD(pos),eTextCenter,"Formatteur",mNameColor,gArchiTheme.mRobotoFont,toHD(20));
 }
 
 void
 InstructionRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos) {
     ImVec2 pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 7,mPos.y + window_pos.y + mRectPos.y + 55);
-    ImGui::SetCursorPos (pos);
-    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::SetCursorPos (toHD(pos));
+    ImGui::PushItemWidth(toHD(mInputTextWidth));
     ImGui::InputText(mInputTextLabel.c_str(), bufOpcode, 4,ImGuiInputTextFlags_CharsDecimal);
     ImGui::PopItemWidth();
     pos = ImVec2(mPos.x + window_pos.x + mRectPos.x + 7,mPos.y + window_pos.y + mRectPos.y + 115);
-    ImGui::SetCursorPos (pos);
-    ImGui::PushItemWidth(mInputTextWidth);
+    ImGui::SetCursorPos (toHD(pos));
+    ImGui::PushItemWidth(toHD(mInputTextWidth));
     ImGui::InputText(mFormaterInputTextLabel.c_str(), buf, 5,ImGuiInputTextFlags_CharsDecimal);
     ImGui::PopItemWidth();
 
@@ -778,12 +778,12 @@ MicrocodeRegister::drawName(ImDrawList* dl,ImVec2 window_pos) {
     ImVec2 thePos;
     thePos = pos;
     thePos.x += 260;
-    addAlignedText(dl,thePos,eTextLeft,"Ordres",mNameColor,gArchiTheme.mRobotoFont,20);
+    addAlignedText(dl,toHD(thePos),eTextLeft,"Ordres",mNameColor,gArchiTheme.mRobotoFont,toHD(20));
     thePos.y +=16;
     //ordres = "  REB1 XS eCO";
     std::string theOrdres = trim(ordres);
     if (theOrdres.size()==0) theOrdres="-";
-    addAlignedText(dl,thePos,eTextLeft,theOrdres.c_str(),mNameColor,gArchiTheme.mRobotoFont,20);
+    addAlignedText(dl,toHD(thePos),eTextLeft,theOrdres.c_str(),mNameColor,gArchiTheme.mRobotoFont,toHD(20));
 
     // suiv
 }
@@ -796,9 +796,9 @@ MicrocodeRegister::drawSingleValue(ImDrawList* dl,ImVec2 pos,int hoffset,std::st
     sprintf(theBuf,formatStr.c_str(),value);
     thePos = pos;
     thePos.x+=hoffset;
-    addAlignedText(dl,thePos,eTextCenter,name.c_str(),mNameColor,gArchiTheme.mRobotoFont,20);
+    addAlignedText(dl,toHD(thePos),eTextCenter,name.c_str(),mNameColor,gArchiTheme.mRobotoFont,toHD(20));
     thePos.y +=16;
-    addAlignedText(dl,thePos,eTextCenter,theBuf,mNameColor,gArchiTheme.mRobotoFont,20);
+    addAlignedText(dl,toHD(thePos),eTextCenter,theBuf,mNameColor,gArchiTheme.mRobotoFont,toHD(20));
 }
 
 void
@@ -893,7 +893,7 @@ MUX::draw(ImDrawList* dl, ImVec2 window_pos){
         thePos = mInputs[k]->mLocalPos;
         thePos.x += window_pos.x + mWireLen+5; thePos.y += window_pos.y-10;
          sprintf(theBuf,"%d",k);
-        addAlignedText(dl,thePos,eTextLeft, theBuf,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+        addAlignedText(dl,toHD(thePos),eTextLeft, theBuf,IM_COL32_WHITE,gArchiTheme.mRobotoFont,toHD(20)) ;
     }
 }
 
@@ -933,48 +933,48 @@ ExtBus::draw(ImDrawList* dl, ImVec2 window_pos){
     textPos = arrowPos;
     textPos.x -=20;
     textPos.y -=80;
-    addAlignedText(dl,textPos,eTextCenter, "Bus",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,24) ;
+    addAlignedText(dl,toHD(textPos),eTextCenter, "Bus",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,toHD(24)) ;
     textPos.y +=21;
-    addAlignedText(dl,textPos,eTextCenter, "de données",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,24) ;
+    addAlignedText(dl,toHD(textPos),eTextCenter, "de données",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,toHD(24)) ;
 
     // data bus : to RAM
-    DrawArrow(dl, 50, 25, 100, CPUToRAMCol,IM_COL32_WHITE,arrowPos, 90);
+    DrawArrow(dl, toHD(50), toHD(25), toHD(100), CPUToRAMCol,IM_COL32_WHITE,toHD(arrowPos), 90);
     arrowPos.x -=45;    
     arrowPos.y +=35;
     symbPos = arrowPos; symbPos.x -=30; symbPos.y+=-45;
-    addAlignedText(dl,symbPos,eTextLeft, "eM",IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    addAlignedText(dl,toHD(symbPos),eTextLeft, "eM",IM_COL32_WHITE,gArchiTheme.mRobotoFont,toHD(20)) ;
 
 
     // data bus : to CPU
-    DrawArrow(dl, 50, 25, 100,  RAMToCPUCol,IM_COL32_WHITE, arrowPos, -90);
+    DrawArrow(dl, toHD(50), toHD(25), toHD(100),  RAMToCPUCol,IM_COL32_WHITE, toHD(arrowPos), -90);
     symbPos = arrowPos; symbPos.x +=50; symbPos.y+=-10;
-    addAlignedText(dl,symbPos,eTextLeft, "sM",IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    addAlignedText(dl,toHD(symbPos),eTextLeft, "sM",IM_COL32_WHITE,gArchiTheme.mRobotoFont,toHD(20)) ;
 
 
 
     arrowPos.x +=50;    
     arrowPos.y +=160;
     textPos = arrowPos; textPos.x +=50;textPos.y -=24;
-    addAlignedText(dl,textPos,eTextLeft, "sM",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,20) ;
+    addAlignedText(dl,toHD(textPos),eTextLeft, "sM",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,toHD(20)) ;
 
-    DrawArrow(dl, 15, 3, 160,  RAMToCPUsignalCol,RAMToCPUsignalCol, arrowPos, 90);
+    DrawArrow(dl, toHD(15), toHD(3), toHD(160),  RAMToCPUsignalCol,RAMToCPUsignalCol, toHD(arrowPos), 90);
     arrowPos.y +=20;
     textPos.y+=45;
-    addAlignedText(dl,textPos,eTextLeft, "eM",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,20) ;
+    addAlignedText(dl,toHD(textPos),eTextLeft, "eM",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,toHD(20)) ;
 
-    DrawArrow(dl, 15, 3, 160,  CPUToRAMsignalCol,CPUToRAMsignalCol, arrowPos, 90);
+    DrawArrow(dl, toHD(15),toHD( 3), toHD(160),  CPUToRAMsignalCol,CPUToRAMsignalCol, toHD(arrowPos), 90);
 
 
 
 
     arrowPos.y +=120;
-    DrawArrow(dl, 50, 25, 100,  AdressBusCol,IM_COL32_WHITE, arrowPos, 90);
+    DrawArrow(dl, toHD(50), toHD(25), toHD(100),  AdressBusCol,IM_COL32_WHITE, toHD(arrowPos), 90);
     textPos = arrowPos;
     textPos.x -=20;
     textPos.y +=30;
-    addAlignedText(dl,textPos,eTextCenter, "Bus",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,24) ;
+    addAlignedText(dl,toHD(textPos),eTextCenter, "Bus",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,toHD(24)) ;
     textPos.y +=21;
-    addAlignedText(dl,textPos,eTextCenter, "d'adresses",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,24) ;
+    addAlignedText(dl,toHD(textPos),eTextCenter, "d'adresses",IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,toHD(24)) ;
 
 }
 

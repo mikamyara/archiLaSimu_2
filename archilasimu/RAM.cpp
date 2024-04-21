@@ -50,18 +50,18 @@ RAM::draw(ImDrawList* dl, ImVec2 window_pos) {
     P2.x = P1.x + mRectSize.x;
     P2.y = P1.y + mRectSize.y;
 
-    dl->AddRectFilled(P1,P2, mGlobalBackground);
-    dl->AddRect(P1,P2, mBorderColor, 0.0f, ImDrawFlags_None, 4.0f);
+    dl->AddRectFilled(toHD(P1),toHD(P2), mGlobalBackground);
+    dl->AddRect(toHD(P1),toHD(P2), mBorderColor, 0.0f, ImDrawFlags_None, toHD(4.0f));
 
     ImVec2 theCPUNamePos = ImVec2( (P1.x + P2.x)/2-30,thePos.y+10 );
-    addAlignedText(dl,theCPUNamePos,eTextCenter,"RAM",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,48);
+    addAlignedText(dl,toHD(theCPUNamePos),eTextCenter,"RAM",IM_COL32(255,255,255,255),gArchiTheme.mRobotoBoldFont,toHD(48));
 
     P1.x += 10;
     P1.y+=130;
     P2.x = P1.x + 280;
     P2.y = P1.y + 590;
 
-    dl->AddRectFilled(P1,P2, mSubPanelBackground);
+    dl->AddRectFilled(toHD(P1),toHD(P2), mSubPanelBackground);
 
 
 }
@@ -72,7 +72,7 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
     ImVec2 pos = ImVec2(mPos.x + window_pos.x+10, mPos.y + window_pos.y+70);
 
 
-    ImGui::SetCursorPos (pos);
+    ImGui::SetCursorPos (toHD(pos));
     ImGui::Checkbox("Assistant : Insertion d'un Opcode\nà partir de sa Mnémonique", &mASM->mShowAssistant);
     mASM->drawOpcodeBuilderWindow(dl,pos);
 
@@ -85,8 +85,8 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
 
 
     pos.y+=60;
-    ImGui::SetCursorPos (pos);
-    if (ImGui::BeginTable("table_RAM", mCols, table_flags, ImVec2(280, 590)))
+    ImGui::SetCursorPos (toHD(pos));
+    if (ImGui::BeginTable("table_RAM", mCols, table_flags, toHD(ImVec2(280, 590))))
     {
         //ImGui::TableSetupColumn(column_names[0], ImGuiTableColumnFlags_NoHide | ImGuiTableColumnFlags_NoReorder);
         for (int n = 0; n < mCols; n++)
@@ -108,11 +108,11 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
                     ImGui::PushID(column);
 
                     if(column == 1) {
-                        ImGui::PushItemWidth(70);
+                        ImGui::PushItemWidth(toHD(70));
                         ImGui::InputText("",mData[row], 8, ImGuiInputTextFlags_CharsDecimal);
                         ImGui::PopItemWidth();
                     } else {
-                        ImGui::PushItemWidth(140);
+                        ImGui::PushItemWidth(toHD(140));
                         ImGui::InputText("",mHelpers[row], 100);
                         ImGui::PopItemWidth();
 

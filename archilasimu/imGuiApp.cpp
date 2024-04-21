@@ -2,6 +2,7 @@
 #include <iostream>
 
 int imGuiApp::sFrameRate=0;
+int imGuiApp::shidpiScale=1;
 
 #define EMSCRIPTEN_MAINLOOP_END_MM     ;     emscripten_set_main_loop(MainLoopForEmscripten, imGuiApp::sFrameRate, true);
 
@@ -17,6 +18,24 @@ imGuiApp::imGuiApp() {
     m_window=nullptr;
     mWindowTitle = "My Basic App";
 
+}
+
+
+
+
+ImVec2  toHD(ImVec2 inPt){
+    return ImVec2(inPt.x*imGuiApp::shidpiScale,inPt.y*imGuiApp::shidpiScale);
+}
+int toHD(int inV) {
+    return inV*imGuiApp::shidpiScale;
+}
+
+
+ImVec2  toLD(ImVec2 inPt){
+    return ImVec2(inPt.x/imGuiApp::shidpiScale,inPt.y/imGuiApp::shidpiScale);
+}
+int toLD(int inV) {
+    return inV/imGuiApp::shidpiScale;
 }
 
 
@@ -96,30 +115,32 @@ imGuiApp::Initialize() {
 #endif
     ImGui_ImplOpenGL3_Init(m_glsl_version.c_str());
 
-/*
+
     int windowWidth, windowHeight;
     int framebufferWidth, framebufferHeight;
     glfwGetWindowSize(m_window, &windowWidth, &windowHeight);
     std::cout << windowWidth<< " "<<windowHeight<<"\n";
     glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  
     std::cout << windowWidth<< " "<<windowHeight<< " " << framebufferWidth << " " <<framebufferHeight << "\n";
-
+/*
     glfwSetWindowSize(
         m_window, 
-        windowWidth * 2, 
-        windowHeight * 2
+        windowWidth * imGuiApp::shidpiScale, 
+        windowHeight * imGuiApp::shidpiScale
     );
-
-        m_io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-        m_io->DisplaySize = ImVec2((float)windowWidth, (float)windowHeight);
 */
-  /*  glViewport(
+ /*       m_io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
+        m_io->DisplaySize = ImVec2((float)windowWidth, (float)windowHeight);
+
+    glViewport(
         0, 
         0, 
-        framebufferWidth * 2, 
-        framebufferHeight * 2
+        framebufferWidth * imGuiApp::shidpiScale, 
+        framebufferHeight * imGuiApp::shidpiScale
     );
-    glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  */
+*/
+    set_canvas_size(windowWidth,windowHeight);
+  /*  glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  */
    // std::cout << windowWidth<< " "<<windowHeight<< " " << framebufferWidth << " " <<framebufferHeight << "\n";
    // set_canvas_size(   windowWidth/2,     windowHeight/2);
 

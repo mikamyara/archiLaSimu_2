@@ -181,19 +181,19 @@ Sequencer::draw(ImDrawList* dl, ImVec2 window_pos) {
     thePos.x +=430;
     thePos.y+=130;
     char theBuf[] = "Valeurs de Cond : ";
-    addAlignedText(dl,thePos,eTextCenter, theBuf,IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,20) ;
+    addAlignedText(dl,toHD(thePos),eTextCenter, theBuf,IM_COL32_WHITE,gArchiTheme.mRobotoBoldFont,toHD(20)) ;
     thePos.y+=18;
     char theBuf1[] = "0:Aucun";
-    addAlignedText(dl,thePos,eTextCenter, theBuf1,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    addAlignedText(dl,toHD(thePos),eTextCenter, theBuf1,IM_COL32_WHITE,gArchiTheme.mRobotoFont,toHD(20)) ;
     thePos.y+=18;
     char theBuf2[] = "1:A==0    2:B==0";
-    addAlignedText(dl,thePos,eTextCenter, theBuf2,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    addAlignedText(dl,toHD(thePos),eTextCenter, theBuf2,IM_COL32_WHITE,gArchiTheme.mRobotoFont,toHD(20)) ;
     thePos.y+=18;
     char theBuf3[] = "3:A>0     4:B >0";
-    addAlignedText(dl,thePos,eTextCenter, theBuf3,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    addAlignedText(dl,toHD(thePos),eTextCenter, theBuf3,IM_COL32_WHITE,gArchiTheme.mRobotoFont,toHD(20)) ;
     thePos.y+=18;
     char theBuf4[] = "5:A pair     6:B pair";
-    addAlignedText(dl,thePos,eTextCenter, theBuf4,IM_COL32_WHITE,gArchiTheme.mRobotoFont,20) ;
+    addAlignedText(dl,toHD(thePos),eTextCenter, theBuf4,IM_COL32_WHITE,gArchiTheme.mRobotoFont,toHD(20)) ;
 
 }
 
