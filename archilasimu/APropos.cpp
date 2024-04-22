@@ -10,20 +10,13 @@ APropos::APropos() {
 
 }
 
-
-    
-       
-
 void  APropos::drawMe(ImDrawList* dl, ImVec2 window_pos){
 
    // ImGui::SetCursorPos (mTablePos);
 
     if(mShowMe == false) return;
 
-
     ImGui::Begin("A Propos de ArchiLaSimu - version Web",&mShowMe,ImGuiWindowFlags_NoResize);
-
-
 
     static bool firstOpen = true;
 

@@ -139,7 +139,7 @@ imGuiApp::Initialize() {
         framebufferHeight * imGuiApp::shidpiScale
     );
 */
-    set_canvas_size(windowWidth,windowHeight);
+    //set_canvas_size(windowWidth,windowHeight);
   /*  glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  */
    // std::cout << windowWidth<< " "<<windowHeight<< " " << framebufferWidth << " " <<framebufferHeight << "\n";
    // set_canvas_size(   windowWidth/2,     windowHeight/2);
