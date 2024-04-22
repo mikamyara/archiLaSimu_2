@@ -1,6 +1,7 @@
 #pragma once
 #include <imgui.h>
 #include <string>
+#include "CodeUploadDownload.h"
 
 class Assembleur;
 class RAM {
@@ -11,6 +12,7 @@ public:
     int     getValue(int address);
     void    setValue(int address,int data);
     void    setRemark(int address, std::string remark);
+    void    insertByExpression(std::string inStr);
 
 
     ImU32  mGlobalBackground,mSubPanelBackground,mBorderColor;
@@ -20,6 +22,7 @@ public:
     int mCols,mRows;
     char** mData;
     char** mHelpers;
+    RamFiles* mRamFiles;
 
     Assembleur* mASM;
 };

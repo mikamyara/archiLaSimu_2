@@ -21,6 +21,7 @@ CPU::CPU() {
     mRAM = nullptr;
     mASM = nullptr;
     mMicrocodeFiles = nullptr;
+    mAlertMicrocodeTable = false;
 
 }
 void
@@ -29,6 +30,9 @@ CPU::Rebuild() {
     mSequencer->Rebuild();
     mMicrocodeFiles = new MicrocodeFiles();
     mMicrocodeFiles->mTable = mSequencer->mCodeTable;    
+    
+
+    mFetchCodeLine = mSequencer->mCodeTable->mRows-3;
 
 }
 
@@ -117,7 +121,7 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
                 if (ImGui::Button("Exécuter une nouvelle\n phase du microcode"))
                 {
                 int code = getCurrent_uCode();
-                runPhase(code,selected);
+                runPhase(code,true);
 
                 }    
             ImGui::PopStyleColor();
@@ -133,8 +137,25 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
                 ImGui::PushStyleColor(ImGuiCol_Button, IM_COL32(60,150,60,255)); 
 
                 // Contenu de l'onglet 2
-                if (ImGui::Button(" Exécuter une nouvelle\ninstruction assembleur"))
-                {
+                if (ImGui::Button(" Exécuter une nouvelle\ninstruction assembleur")) 
+                { 
+                bool again = true;
+                int cpt =0;
+                do {
+                    int code;
+                    code = getCurrent_uCode();
+                    runPhase(code,false);
+                    cpt++;
+                    if(mSequencer->MicrocodeReg->Fin == 1) again = false;
+                    if(cpt>10000) again = false;
+                    //std::cout << "CODE : " << code << "\n";
+                    } while(again);
+                if( mSequencer->MicrocodeReg->Fin!=1) {
+                 //   std::cout << "HAHA\n";
+                    mAlertMicrocodeTable = true;
+                }
+               // std::cout << "CPT " << cpt << " FIN " << mSequencer->MicrocodeReg->Fin << " AGAIN " << again<<"\n"; 
+
                 }    
             ImGui::PopStyleColor();
             ImGui::EndTabItem ();
@@ -180,6 +201,24 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     mArchiCircuit->drawWidgets(dl,pos);
     mSequencer->drawWidgets(dl,pos);
 
+    if(mAlertMicrocodeTable) {
+        ImGui::SetNextWindowPos(ImVec2(300, 100));  
+        ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_Always);        
+        ImGui::Begin("Erreur dans la table des microcodes !",&mAlertMicrocodeTable,ImGuiWindowFlags_NoResize|ImGuiWindowFlags_NoCollapse);
+        ImGui::PushItemWidth(300);          
+
+        const char* texte = "L'instruction assembleur en cours n'a pas abouti "
+                            "après 10 000 itérations dans la table du microcode. "
+                            "Elle est sûrement mal implémentée.\n"
+                            "Il est aussi possible que vous ayez lancé l'exécution d'une " 
+                            "instruction assembleur non implémentée dans la table de microcode, "
+                            "ou avec un OpCode non défini.";
+
+        ImGui::TextWrapped("%s", texte);
+        if(ImGui::Button("D'accord.")) { mAlertMicrocodeTable = false;}
+        ImGui::PopItemWidth();  // Restaure la largeur précédente
+        ImGui::End(); 
+    }
 }
 
 void
@@ -247,8 +286,8 @@ CPU::Reset() {
     setRegisterValue("Fin",0);
     setRegisterValue("SeIMS",0);
     setRegisterValue("RI_OpCode",0);
-    setRegisterValue("Fetch",509);
-    setRegisterValue("Microcode",509);
+    setRegisterValue("Fetch",mFetchCodeLine);
+    setRegisterValue("Microcode",mFetchCodeLine);
 
     // ui related
     mArchiCircuit->mBus1->changeBusStatus(normal);
@@ -256,9 +295,9 @@ CPU::Reset() {
     mArchiCircuit->mBus3->changeBusStatus(normal);
 
     // add fetch
-    mSequencer->mCodeTable->insertByExpression ("509:000:0:0:0: COB1 XS eRAM");
-    mSequencer->mCodeTable->insertByExpression ("510:000:0:0:0: sM");
-    mSequencer->mCodeTable->insertByExpression ("511:000:2:0:0: REB1 XS eRI");
+    mSequencer->mCodeTable->insertByExpression (std::to_string(mFetchCodeLine+0)+":000:0:0:0: COB1 XS eRAM");
+    mSequencer->mCodeTable->insertByExpression (std::to_string(mFetchCodeLine+1)+":000:0:0:0: sM");
+    mSequencer->mCodeTable->insertByExpression (std::to_string(mFetchCodeLine+2)+":000:2:0:0: REB1 XS eRI");
 
 
 
@@ -282,9 +321,8 @@ int CPU::getCurrent_uCode() {
 }
 
 int  
-CPU::calcNext_uCode(){
+CPU::calcNext_uCode(bool displayBusses){
 
- 
     //regs
     int microcode = getRegisterValue("Microcode");
     int Fetch = getRegisterValue("Fetch");
@@ -300,29 +338,29 @@ CPU::calcNext_uCode(){
     int plus1 = microcode + 1;
     
     if(Fin==1) { 
-        mSequencer->displayBusses("Fetch");
+        if(displayBusses)mSequencer->displayBusses("Fetch");
         return Fetch;
     }
     else { // Fin=0, so look at SeIMS 
      if(SeIMS==0) {
-        mSequencer->displayBusses("Plus1Seims");
+        if(displayBusses)mSequencer->displayBusses("Plus1Seims");
         return plus1;
      }
      if(SeIMS==2) {
-        mSequencer->displayBusses("OpCode");
+        if(displayBusses)mSequencer->displayBusses("OpCode");
         return OpCode;
      }
      if(SeIMS==3) {
-        mSequencer->displayBusses("Suiv");
+        if(displayBusses)mSequencer->displayBusses("Suiv");
         return Suiv;
      }
      if(SeIMS==1) { // SeIMS == 1 and Fin == 0, so look at cond
         if(RCond==0)  {
-            mSequencer->displayBusses("Plus1Rcond");        
+            if(displayBusses)mSequencer->displayBusses("Plus1Rcond");        
             return plus1;
         }
         else {
-            mSequencer->displayBusses("SuivRcond");        
+            if(displayBusses)mSequencer->displayBusses("SuivRcond");        
             return Suiv;
         }
        }
@@ -379,7 +417,6 @@ CPU::runPhase(int uCode,bool illustrate){
             break;
         case 6 : RCond = ((B%2==0)?1:0);
             break;
-
     }
 
     setRegisterValue("RCond",RCond);
@@ -388,7 +425,7 @@ CPU::runPhase(int uCode,bool illustrate){
     std::vector < std::string > ordersList;
     explode(str, ordersList);
 
-    executeArchiOrders(ordersList);
+    executeArchiOrders(ordersList,illustrate);
 
 
     if(illustrate){
@@ -397,7 +434,7 @@ CPU::runPhase(int uCode,bool illustrate){
 
     setRegisterValue("RI_OpCode",mArchiCircuit->RI->getOpCodeValue());
 
-    int newCode = calcNext_uCode();
+    int newCode = calcNext_uCode(illustrate);
     setRegisterValue("Microcode",newCode);
     
   
@@ -405,7 +442,7 @@ CPU::runPhase(int uCode,bool illustrate){
 
 
 void
-CPU::executeArchiOrders(const std::vector<std::string>& inOrders) {
+CPU::executeArchiOrders(const std::vector<std::string>& inOrders,bool hilite) {
     {
         std::vector<std::string>& signals = mArchiCircuit->mOtherSignals;
         deselectExtBus();        
@@ -415,11 +452,11 @@ CPU::executeArchiOrders(const std::vector<std::string>& inOrders) {
                 if(signals[l] == inOrders[k]) {
                     int address = getRegisterValue("RAM");
                     if(signals[l]=="sM") {
-                        sortieMemoire(address);
+                        sortieMemoire(address,hilite);
                     }
                     if(signals[l]=="eM") {
                     int data = getRegisterValue("RE");
-                        entreeMemoire(address,data);
+                        entreeMemoire(address,data,hilite);
                     }
 
                 }
@@ -541,12 +578,14 @@ CPU::deselectExtBus() {
 }
 
 void 
-CPU::sortieMemoire(int address){
+CPU::sortieMemoire(int address,bool hilite){
 
 
     // ui related
-    mExternalBus->mAdressBusSelected = true;
-    mExternalBus->mRAMToCPU = true;
+    if(hilite){
+        mExternalBus->mAdressBusSelected = true;
+        mExternalBus->mRAMToCPU = true;
+    }
     int data = mRAM->getValue(getRegisterValue("RAM"));
     setRegisterValue("RE",data);
 
@@ -554,8 +593,10 @@ CPU::sortieMemoire(int address){
 }
 
 void 
-CPU::entreeMemoire(int address,int data){
-    mExternalBus->mAdressBusSelected = true;
-    mExternalBus->mCPUToRAM = true;
+CPU::entreeMemoire(int address,int data,bool hilite){
+    if(hilite){
+        mExternalBus->mAdressBusSelected = true;
+        mExternalBus->mCPUToRAM = true;
+    }
     mRAM->setValue(getRegisterValue("RAM"),getRegisterValue("RE"));
 }

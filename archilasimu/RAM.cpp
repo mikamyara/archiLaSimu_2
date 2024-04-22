@@ -3,9 +3,12 @@
 #include "ArchiTheme.h"
 #include <string.h>
 #include "Assembleur.h"
+#include <regex>
+#include <string.h>
 
 RAM::RAM()  {
     mASM = nullptr;
+    mRamFiles = nullptr;
 
     int k;
     mCols=3;
@@ -38,6 +41,10 @@ RAM::RAM()  {
     mGlobalBackground   = IM_COL32(80, 80, 80,255);
     mSubPanelBackground = IM_COL32(60, 60, 60,255);
     mBorderColor = IM_COL32(140, 140, 140,255);
+
+    mRamFiles = new RamFiles();
+    mRamFiles->mRAM = this;
+    
 }
 
 void
@@ -69,12 +76,21 @@ RAM::draw(ImDrawList* dl, ImVec2 window_pos) {
 
 void
 RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
-    ImVec2 pos = ImVec2(mPos.x + window_pos.x+10, mPos.y + window_pos.y+70);
+    ImVec2 pos = ImVec2(mPos.x + window_pos.x+10, mPos.y + window_pos.y+50);
 
 
     ImGui::SetCursorPos (toHD(pos));
     ImGui::Checkbox("Assistant : Insertion d'un Opcode\nà partir de sa Mnémonique", &mASM->mShowAssistant);
     mASM->drawOpcodeBuilderWindow(dl,pos);
+    pos.x+=30; pos.y+=46;
+    ImGui::SetCursorPos (toHD(pos));
+    if(ImGui::Button("Charger RAM")) {
+        mRamFiles->Upload();
+    }
+    ImGui::SameLine();
+    if(ImGui::Button("Enregistrer RAM")) {
+        mRamFiles->Download();
+    }
 
 
     static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable  | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn; // ImGuiTableFlags_Resizable
@@ -83,8 +99,8 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
     static int frozen_cols = 1;
     static int frozen_rows = 2;
 
-
-    pos.y+=60;
+    pos.x-=30;
+    pos.y+=34;
     ImGui::SetCursorPos (toHD(pos));
     if (ImGui::BeginTable("table_RAM", mCols, table_flags, toHD(ImVec2(280, 590))))
     {
@@ -152,7 +168,28 @@ RAM::setValue(int address,int data){
 void    
 RAM::setRemark(int address, std::string remark)
 {
-        if (address>=0 && address <mRows) {
-            ::sprintf(mHelpers[address],"%s",remark.c_str());
-        }
+    if (address>=0 && address <mRows) {
+        ::sprintf(mHelpers[address],"%s",remark.c_str());
+    }
+}
+
+
+
+void    
+RAM::insertByExpression(std::string s){
+        std::regex
+    rgx
+    ("^\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]*)\\s*[:/\\|](.*)");
+    std::smatch match;
+
+    if (std::regex_search (s.cbegin (), s.cend (), match, rgx))
+    {
+        int row = atoi(std::string(match[1]).c_str());
+        strcpy(mData[row],std::string(match[2]).c_str());
+        strcpy(mHelpers[row],std::string(match[3]).c_str());        
+        //return true;
+    }
+    //return false;
+
+
 }

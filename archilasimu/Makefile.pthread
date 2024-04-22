@@ -23,7 +23,7 @@ SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
-CPPFLAGS = 
+CPPFLAGS =-pthread
 LDFLAGS = -sEXPORTED_FUNCTIONS=[_main,_malloc,_free] -sEXPORTED_RUNTIME_METHODS=[ccall] -sALLOW_MEMORY_GROWTH=1 
 EMS =
 
@@ -59,7 +59,7 @@ endif
 CPPFLAGS += -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
 #CPPFLAGS += -g
 CPPFLAGS += -Wall -Wformat -Os $(EMS)
-LDFLAGS += --shell-file ../libs/emscripten/shell_minimal.html -s FULL_ES2=1 -s USE_WEBGL2=1
+LDFLAGS += --shell-file ../libs/emscripten/shell_minimal.html -s FULL_ES2=1 -s USE_WEBGL2=1 -sUSE_PTHREADS=1
 LDFLAGS += $(EMS)
 
 ##---------------------------------------------------------------------

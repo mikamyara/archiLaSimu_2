@@ -1,0 +1,28 @@
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+import ssl
+
+# Classe personnalisée pour ajouter des en-têtes de sécurité
+class SecureHTTPRequestHandler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        # Ajoute les en-têtes de sécurité requis
+        self.send_header('Cross-Origin-Opener-Policy', 'same-origin')
+        self.send_header('Cross-Origin-Embedder-Policy', 'require-corp')
+        super().end_headers()
+
+# Adresse et port du serveur
+server_address = ('192.168.122.103', 4443)
+
+# Créer le serveur HTTP sécurisé
+httpd = HTTPServer(server_address, SecureHTTPRequestHandler)
+
+# Appliquez le SSL/TLS au serveur
+httpd.socket = ssl.wrap_socket(
+    httpd.socket,
+    keyfile="server.key",  # Clé privée
+    certfile="server.cert",  # Certificat
+    server_side=True
+)
+
+print("Serveur HTTPS avec en-têtes de sécurité démarré sur https://localhost:4443")
+httpd.serve_forever()
+

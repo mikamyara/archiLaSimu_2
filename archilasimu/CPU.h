@@ -19,17 +19,17 @@ public :
     void Reset();
     void setRegisterValue(std::string regName,int inValue);
     int  getRegisterValue(std::string regName);
-    void executeArchiOrders( const std::vector<std::string>& inOrders);
+    void executeArchiOrders( const std::vector<std::string>& inOrders,bool hilite);
     void hiliteArchiOrders( const std::vector<std::string>& inOrders,eSignalStatus inStatus);
 
 
     int getCurrent_uCode();
-    int  calcNext_uCode();
+    int  calcNext_uCode(bool displayBusses);
     void runPhase(int uCode,bool illustrate); 
     void refreshMicroCodeReg(int uCode);
 
-    void sortieMemoire(int address);
-    void entreeMemoire(int address,int data);
+    void sortieMemoire(int address,bool hilite);
+    void entreeMemoire(int address,int data,bool hilite);
     void deselectExtBus();
 
     ArchiCircuit* mArchiCircuit;
@@ -41,6 +41,7 @@ public :
     Assembleur* mASM;
 
     MicrocodeFiles* mMicrocodeFiles;
-
+    int mFetchCodeLine;
+    bool mAlertMicrocodeTable;
 
 };

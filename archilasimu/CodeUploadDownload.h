@@ -1,5 +1,8 @@
 #pragma once
 #include "MicrocodeTable.h"
+
+
+
 #include <string>
 
 class MicrocodeFiles {
@@ -10,4 +13,17 @@ public :
 
     MicrocodeTable* mTable;
 
+};
+
+
+
+class RAM;
+
+class RamFiles {
+public :
+    RamFiles();
+    void Download();
+    void Upload();
+
+    RAM* mRAM;
 };
