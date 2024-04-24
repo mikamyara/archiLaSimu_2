@@ -82,7 +82,7 @@ $(WEB_DIR):
 	mkdir $@
 
 serve: all
-	python3 -m http.server -d $(WEB_DIR) --bind 192.168.122.103 8000
+	python3 -m http.server -d $(WEB_DIR) --bind 127.0.0.1 8000
 
 $(EXE): $(OBJS) $(WEB_DIR)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)

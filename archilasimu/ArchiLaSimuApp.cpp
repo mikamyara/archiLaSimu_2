@@ -76,7 +76,7 @@ ArchiLaSimuApp::customInit ()
     mCPU->Reset();    
 
     mAPropos = new APropos();
-std::cout << emscripten_get_device_pixel_ratio();
+//std::cout << emscripten_get_device_pixel_ratio();
 
     return 0;
 }

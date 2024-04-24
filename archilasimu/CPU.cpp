@@ -313,6 +313,9 @@ CPU::Reset() {
 
     refreshMicroCodeReg(0);
     mSequencer->displayBusses("CleanOnly");
+    mExternalBus->mAdressBusSelected = false;
+    mExternalBus->mRAMToCPU = false;
+    mExternalBus->mCPUToRAM = false;
 
 }
 
