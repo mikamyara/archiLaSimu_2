@@ -620,7 +620,27 @@ CombinatorialOperator::buildOperations()
     mOperations["PLUS1"] = [](int X, int Y) {
         return X+1;
     };
-
+    mOperations["MOINS1"] = [](int X, int Y) {
+        return X-1;
+    };    
+    mOperations["AND"] = [](int X, int Y) {
+        return X&Y;
+    };
+    mOperations["OR"] = [](int X, int Y) {
+        return X|Y;
+    };    
+    mOperations["XOR"] = [](int X, int Y) {
+        return X|Y;
+    };    
+    mOperations["ROL"] = [](int X, int Y) {
+        return X>>Y;
+    };    
+    mOperations["ROR"] = [](int X, int Y) {
+        return X<<Y;
+    };   
+    mOperations["NOT"] = [](int X, int Y) {
+        return ~X;
+    };          
 }
 
 
