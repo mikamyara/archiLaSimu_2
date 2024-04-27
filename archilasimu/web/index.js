@@ -16,7 +16,7 @@ var Module = typeof Module != 'undefined' ? Module : {};
 
 // --pre-jses are emitted after the Module integration code, so that they can
 // refer to Module (if they choose; they can also define Module)
-// include: /tmp/tmplrp61x8g.js
+// include: /tmp/tmpvb68o8z7.js
 
   if (!Module.expectedDataFileDownloads) {
     Module.expectedDataFileDownloads = 0;
@@ -196,21 +196,21 @@ Module['FS_createPath']("/", "imgs", true, true);
 
   })();
 
-// end include: /tmp/tmplrp61x8g.js
-// include: /tmp/tmpe4gnukgb.js
+// end include: /tmp/tmpvb68o8z7.js
+// include: /tmp/tmptnyxn5ek.js
 
     // All the pre-js content up to here must remain later on, we need to run
     // it.
     if (Module['ENVIRONMENT_IS_PTHREAD'] || Module['$ww']) Module['preRun'] = [];
     var necessaryPreJSTasks = Module['preRun'].slice();
-  // end include: /tmp/tmpe4gnukgb.js
-// include: /tmp/tmpi5chpm7j.js
+  // end include: /tmp/tmptnyxn5ek.js
+// include: /tmp/tmpvagfzqtv.js
 
     if (!Module['preRun']) throw 'Module.preRun should exist because file support used it; did a pre-js delete it?';
     necessaryPreJSTasks.forEach(function(task) {
       if (Module['preRun'].indexOf(task) < 0) throw 'All preRun tasks that exist before user pre-js code should remain after; did you replace Module or modify Module.preRun?';
     });
-  // end include: /tmp/tmpi5chpm7j.js
+  // end include: /tmp/tmpvagfzqtv.js
 
 
 // Sometimes an existing Module object exists with properties
@@ -9031,12 +9031,11 @@ var __emscripten_stack_alloc = (a0) => (__emscripten_stack_alloc = wasmExports['
 var _emscripten_stack_get_current = () => (_emscripten_stack_get_current = wasmExports['emscripten_stack_get_current'])();
 var ___cxa_is_pointer_type = createExportWrapper('__cxa_is_pointer_type', 1);
 var dynCall_jiji = Module['dynCall_jiji'] = createExportWrapper('dynCall_jiji', 5);
-var dynCall_viijii = Module['dynCall_viijii'] = createExportWrapper('dynCall_viijii', 7);
 var dynCall_iiiiij = Module['dynCall_iiiiij'] = createExportWrapper('dynCall_iiiiij', 7);
 var dynCall_iiiiijj = Module['dynCall_iiiiijj'] = createExportWrapper('dynCall_iiiiijj', 9);
 var dynCall_iiiiiijj = Module['dynCall_iiiiiijj'] = createExportWrapper('dynCall_iiiiiijj', 10);
-var ___start_em_js = Module['___start_em_js'] = 248344;
-var ___stop_em_js = Module['___stop_em_js'] = 249943;
+var ___start_em_js = Module['___start_em_js'] = 250280;
+var ___stop_em_js = Module['___stop_em_js'] = 251879;
 
 // include: postamble.js
 // === Auto-generated postamble setup entry stuff ===

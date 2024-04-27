@@ -78,7 +78,6 @@ MicrocodeTable::Rebuild ()
     std::string uped;
     for (k = 0; k < theColsList.size (); k++)
     {   uped = toUpper(theColsList[k]);
-       // std::cout << uped <<" "<< k << "\n";
         sigToCol[uped] = k;
 
         if(!(uped =="UCODE" || uped =="SUIV" || uped =="SEIMS" || uped =="COND" || uped =="FIN")) { 

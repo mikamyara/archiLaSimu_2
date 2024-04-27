@@ -1,5 +1,5 @@
 #include "ArchiTheme.h"
-#include <math.h>
+#include <cmath>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -68,9 +68,9 @@ void drawOrientedTriangle(ImDrawList* dl, ImVec2 pos, float l, float a, ImU32 co
     float halfL = l / 2.0f;
     float radians = a * 3.14159265359f / 180.0f; // Convertir l'angle en radians
 
-    ImVec2 p1(pos.x + halfL * cos(radians), pos.y + halfL * sin(radians)); // Point 1
-    ImVec2 p2(pos.x + halfL * cos(radians + 2.094f), pos.y + halfL * sin(radians + 2.094f)); // Point 2 (2.094 radians = 120 degrés)
-    ImVec2 p3(pos.x + halfL * cos(radians - 2.094f), pos.y + halfL * sin(radians - 2.094f)); // Point 3
+    ImVec2 p1(pos.x + halfL * std::cos(radians), pos.y + halfL * std::sin(radians)); // Point 1
+    ImVec2 p2(pos.x + halfL * std::cos(radians + 2.094f), pos.y + halfL * std::sin(radians + 2.094f)); // Point 2 (2.094 radians = 120 degrés)
+    ImVec2 p3(pos.x + halfL * std::cos(radians - 2.094f), pos.y + halfL * std::sin(radians - 2.094f)); // Point 3
 
     dl->AddTriangleFilled(p1, p2, p3, color);
 }

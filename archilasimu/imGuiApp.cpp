@@ -92,17 +92,7 @@ imGuiApp::Initialize() {
     m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     m_io->ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-
-    // try hidpi : does not work.
-    /*std::cout << "FONT : " << m_io->FontGlobalScale<< "\n";
-    std::cout << m_io->DisplaySize.x << " "  << m_io->DisplaySize.y<<"\n" ;
-    std::cout << m_io->DisplayFramebufferScale.x << " " <<m_io->DisplayFramebufferScale.y << "\n";
-    m_io->DisplayFramebufferScale.x = 2;
-    m_io->DisplayFramebufferScale.y = 2;
-    m_io->DisplaySize.x = 800;
-    m_io->DisplaySize.y = 600;
-    m_io->FontGlobalScale = 0.5;
-    */
+ 
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
@@ -119,43 +109,9 @@ imGuiApp::Initialize() {
     int windowWidth, windowHeight;
     int framebufferWidth, framebufferHeight;
     glfwGetWindowSize(m_window, &windowWidth, &windowHeight);
-    std::cout << windowWidth<< " "<<windowHeight<<"\n";
-    glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  
-    std::cout << windowWidth<< " "<<windowHeight<< " " << framebufferWidth << " " <<framebufferHeight << "\n";
-/*
-    glfwSetWindowSize(
-        m_window, 
-        windowWidth * imGuiApp::shidpiScale, 
-        windowHeight * imGuiApp::shidpiScale
-    );
-*/
- /*       m_io->DisplayFramebufferScale = ImVec2(1.0f, 1.0f);
-        m_io->DisplaySize = ImVec2((float)windowWidth, (float)windowHeight);
-
-    glViewport(
-        0, 
-        0, 
-        framebufferWidth * imGuiApp::shidpiScale, 
-        framebufferHeight * imGuiApp::shidpiScale
-    );
-*/
-    //set_canvas_size(windowWidth,windowHeight);
-  /*  glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  */
-   // std::cout << windowWidth<< " "<<windowHeight<< " " << framebufferWidth << " " <<framebufferHeight << "\n";
-   // set_canvas_size(   windowWidth/2,     windowHeight/2);
-
-   /// glfwSetFramebufferSize(m_window, framebufferWidth*2, framebufferHeight*2);  
-
-    //float pixelRatio = static_cast<float>(framebufferWidth) / static_cast<float>(windowWidth);
-
-    // Configurer l'échelle de Dear ImGui pour HiDPI
-    //ImGui::GetIO().FontGlobalScale = pixelRatio;
-
-
-
-
-
-
+     glfwGetFramebufferSize(m_window, &framebufferWidth, &framebufferHeight);  
+ 
+ 
 
 
 

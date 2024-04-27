@@ -5,7 +5,6 @@ APropos::APropos() {
     mShowMe=false;
 
     LoadImage("imgs/logos.png",&logo_eea_tid,&logo_eea_w,&logo_eea_h);
-    std::cout << logo_eea_tid << "\n";
 
 
 }

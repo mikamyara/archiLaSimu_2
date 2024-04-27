@@ -13,24 +13,11 @@
 #include <pthread.h>
 #include <unistd.h> // Pour sleep
 
-/*
-
-// Fonction de travail du thread
-void* worker_thread(void* arg) {
-    std::cout << "HERE\n";
-    while (1) {
-        printf("Thread en cours...\n");
-        sleep(1);  // Simule du travail
-    }
-    printf("Thread arrêté.\n");
-    return NULL;
-}
-
-*/
+ 
 
 
 ArchiLaSimuApp::ArchiLaSimuApp ():imGuiApp ()
-{      std::cout << "thread started" << "\n";
+{       
 
     m_customFont = nullptr;
     m_show_demo_window = false;
@@ -40,13 +27,7 @@ ArchiLaSimuApp::ArchiLaSimuApp ():imGuiApp ()
     imGuiApp::sFrameRate = 15;
     mWindowTitle = "Archi La Simu - version Web";
 
-    /*
-   pthread_t thread;
-
-    // Créer un thread
-    pthread_create(&thread, NULL, worker_thread, NULL);
-    std::cout << "thread started" << "\n";
-    */
+ 
 }
 
 int
@@ -76,7 +57,6 @@ ArchiLaSimuApp::customInit ()
     mCPU->Reset();    
 
     mAPropos = new APropos();
-//std::cout << emscripten_get_device_pixel_ratio();
 
     return 0;
 }

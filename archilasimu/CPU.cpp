@@ -148,13 +148,10 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
                     cpt++;
                     if(mSequencer->MicrocodeReg->Fin == 1) again = false;
                     if(cpt>10000) again = false;
-                    //std::cout << "CODE : " << code << "\n";
                     } while(again);
                 if( mSequencer->MicrocodeReg->Fin!=1) {
-                 //   std::cout << "HAHA\n";
                     mAlertMicrocodeTable = true;
                 }
-               // std::cout << "CPT " << cpt << " FIN " << mSequencer->MicrocodeReg->Fin << " AGAIN " << again<<"\n"; 
 
                 }    
             ImGui::PopStyleColor();
@@ -274,11 +271,11 @@ void
 CPU::Reset() {
     setRegisterValue("RA",0);
     setRegisterValue("RB",0);
-    setRegisterValue("RC",0);
-    setRegisterValue("RD",0);
+    setRegisterValue("RX",0);
+    //setRegisterValue("RD",0);
     setRegisterValue("RE",0);
     setRegisterValue("RI",0);
-    setRegisterValue("RX",0);
+    setRegisterValue("SP",0);
     setRegisterValue("CO",0);
     setRegisterValue("RAM",0);
     ::sprintf(mArchiCircuit->OP->buf,"%s","");
@@ -378,9 +375,7 @@ CPU::refreshMicroCodeReg(int uCode){
     mSequencer->MicrocodeReg->uCode = uCode;
     mSequencer->MicrocodeReg->SeIMS = T->mSeIMS[uCode];
     mSequencer->MicrocodeReg->Cond = T->mCond[uCode];
-    /*std::cout << uCode << " : ";
-    for(int k=0;k<10;k++) {  std::cout << T->mSignals[uCode][k]<<" ";}
-    std::cout <<"    " << T->sigToCol["FIN"] << "\n";*/
+
 
     mSequencer->MicrocodeReg->Fin = T->mSignals[uCode][T->sigToCol["FIN"]]?1:0;
 

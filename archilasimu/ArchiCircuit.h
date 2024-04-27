@@ -22,7 +22,7 @@ public :
 
 
 
-    RegisterBus123  *RA,*RB,*RC,*RD,*CO,*RX,*RE,*RAM;
+    RegisterBus123  *RA,*RB,*RX,*CO,*SP,*RE,*RAM;
     IOBox *sensEch;
 
     CombinatorialOperator* OP;
