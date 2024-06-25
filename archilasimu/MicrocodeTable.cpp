@@ -24,7 +24,7 @@ void
 MicrocodeTable::Rebuild ()
 {
 
-    mRows = 512;
+    mRows = 256;
 //## Step A : check column names
     std::vector < std::string > theColsList;
 // build a list of all signals to consider in the MicrocodeTable

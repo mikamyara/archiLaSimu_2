@@ -58,6 +58,7 @@ class Assembleur {
 
         char** menuMnemonics;
         int nbMenuMnemonics;
+        int mSingleAddressingModeBeginAt,mLastOpCode;
         std::map<std::string,OpDesc> mOpDescForMenu;
         
         RAM* mRAM;

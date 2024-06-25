@@ -31,6 +31,8 @@ Assembleur::Assembleur() {
 mRAM = nullptr;
 menuMnemonics=nullptr;
 nbMenuMnemonics=0;
+mSingleAddressingModeBeginAt=0,mLastOpCode=0;
+
 
 modes["Imm"] = "Immédiat";              modesInv["Immédiat"]        = "Imm";
 modes["Dir"] = "Direct";                modesInv["Direct"]          = "Dir";
@@ -58,7 +60,7 @@ mShowAssistant = false;
     strcpy(mColNames[2],"Adressage");
     strcpy(mColNames[3],"Commentaire");
 
-    mRows = 501;
+    mRows = 256;
     mCols = 4;
  }
  
@@ -148,88 +150,86 @@ void
 Assembleur::buildMnemonics() {
     std::vector<std::string> all = {"Imm","Dir","Ind","Idx","Rel"/*,"ImmExt","DirExt","IndExt","IdxExt","RelExt"*/};
     std::vector<std::string> most = {"","Dir","Ind","Idx","Rel",/*"","DirExt","IndExt","IdxExt","RelExt"*/};
+    std::vector<std::string> imm = {"Imm",/*"","DirExt","IndExt","IdxExt","RelExt"*/};
+    std::vector<std::string> dir = {"Dir",/*"","DirExt","IndExt","IdxExt","RelExt"*/};
+
     // Math
     addManyMmnemonics("ADD_A",0,all,"Ajoute une valeur, selon mode d'adressage, au registre RA.");
     addManyMmnemonics("ADD_B",5,all,"Ajoute une valeur, selon mode d'adressage, au registre RB.");
-    addManyMmnemonics("ADD_X",10,most,"Ajoute une valeur, selon mode d'adressage, à l'adresse du registre RX.");
-    addManyMmnemonics("SUB_A",15,all,"Retranche une valeur, selon mode d'adressage, au registre RA.");
-    addManyMmnemonics("SUB_B",20,all,"Retranche une valeur, selon mode d'adressage, au registre RB.");
-    addManyMmnemonics("SUB_X",25,most,"Retranche une valeur, selon mode d'adressage, à l'adresse du registre RX.");
-    addManyMmnemonics("MUL_A",30,all,"Multiplie une valeur, selon mode d'adressage, au registre RA.");
-    addManyMmnemonics("MUL_B",35,all,"Multiplie une valeur, selon mode d'adressage, au registre RB");
-    addManyMmnemonics("DIV_A",45,all,"Multiplie une valeur, selon mode d'adressage, au registre RA.");
-    addManyMmnemonics("DIV_B",50,all,"Multiplie une valeur, selon mode d'adressage, au registre RB.");
+    addManyMmnemonics("SUB_A",10,all,"Retranche une valeur, selon mode d'adressage, au registre RA.");
+    addManyMmnemonics("SUB_B",15,all,"Retranche une valeur, selon mode d'adressage, au registre RB.");
+    addManyMmnemonics("MUL_A",20,all,"Multiplie une valeur, selon mode d'adressage, au registre RA.");
+    addManyMmnemonics("MUL_B",25,all,"Multiplie une valeur, selon mode d'adressage, au registre RB");
+    addManyMmnemonics("DIV_A",30,all,"Multiplie une valeur, selon mode d'adressage, au registre RA.");
+    addManyMmnemonics("DIV_B",35,all,"Multiplie une valeur, selon mode d'adressage, au registre RB.");
+ 
 
     // Bool Bitwise 
-    addManyMmnemonics("AND_A",55,all,"Effectue un 'ET' logique bit a bit avec une valeur, selon mode d'adressage, au registre RA.");    
-    addManyMmnemonics("AND_B",60,all,"Effectue un 'ET' logique bit a bit avec une valeur, selon mode d'adressage, au registre RB.");    
+    addManyMmnemonics("AND_A",40,all,"Effectue un 'ET' logique bit a bit avec une valeur, selon mode d'adressage, au registre RA.");    
+    addManyMmnemonics("AND_B",45,all,"Effectue un 'ET' logique bit a bit avec une valeur, selon mode d'adressage, au registre RB.");    
 
-    addManyMmnemonics("OR_A",70,all,"Effectue un 'OU' logique bit a bit avec une valeur, selon mode d'adressage, au registre RA.");    
-    addManyMmnemonics("OR_B",75,all,"Effectue un 'OU' logique bit a bit avec une valeur, selon mode d'adressage, au registre RB.");    
+    addManyMmnemonics("OR_A",50,all,"Effectue un 'OU' logique bit a bit avec une valeur, selon mode d'adressage, au registre RA.");    
+    addManyMmnemonics("OR_B",55,all,"Effectue un 'OU' logique bit a bit avec une valeur, selon mode d'adressage, au registre RB.");    
 
-    addManyMmnemonics("XOR_A",85,all,"Effectue un 'OU exlusif' logique bit a bit avec une valeur, selon mode d'adressage, au registre RA.");    
-    addManyMmnemonics("XOR_B",90,all,"Effectue un 'OU exlusif' logique bit a bit avec une valeur, selon mode d'adressage, au registre RB.");    
+    addManyMmnemonics("XOR_A",60,all,"Effectue un 'OU exlusif' logique bit a bit avec une valeur, selon mode d'adressage, au registre RA.");    
+    addManyMmnemonics("XOR_B",65,all,"Effectue un 'OU exlusif' logique bit a bit avec une valeur, selon mode d'adressage, au registre RB.");    
 
 
-    addManyMmnemonics("LOAD_A",100,all,"Copie une valeur, selon mode d'adressage, dans le registre RA.");
-    addManyMmnemonics("LOAD_B",105,all,"Copie une valeur, selon mode d'adressage, dans le registre RB.");
-    addManyMmnemonics("LOAD_X",110,most,"Copie une adresse, selon mode d'adressage, dans le registre RX.");
-    addManyMmnemonics("LOAD_SP",115,most,"Copie une valeur, selon mode d'adressage, sur la pile (SP).");
+    addManyMmnemonics("LOAD_A",70,all,"Copie une valeur, selon mode d'adressage, dans le registre RA.");
+    addManyMmnemonics("LOAD_B",75,all,"Copie une valeur, selon mode d'adressage, dans le registre RB.");
  
-    addManyMmnemonics("STORE_A",120,most,"Copie la valeur du registre RA dans la RAM, selon mode d'adressage.");
-    addManyMmnemonics("STORE_B",125,most,"Copie la valeur du registre RB dans la RAM, selon mode d'adressage.");
-    addManyMmnemonics("STORE_X",130,most,"Copie l'adresse contenue dans le registre RX vers la RAM, selon mode d'adressage.");
-    addManyMmnemonics("STORE_SP",135,most,"Copie l'adresse contenue dans la pile (SP) vers la RAM, selon mode d'adressage.");
+    addManyMmnemonics("STORE_A",80,most,"Copie la valeur du registre RA dans la RAM, selon mode d'adressage.");
+    addManyMmnemonics("STORE_B",85,most,"Copie la valeur du registre RB dans la RAM, selon mode d'adressage.");
+ 
+  
+    addManyMmnemonics("JUMP",90,most,"Saut inconditionnel.");
+    addManyMmnemonics("JUMP(A==0)",95,most,"Saut Conditionnel (Saut si RA==0).");
+    addManyMmnemonics("JUMP(B==0)",100,most,"Saut Conditionnel (Saut si RB==0).");
+    addManyMmnemonics("JUMP(A>0)",105,most,"Saut Conditionnel (Saut si RA>0).");
+    addManyMmnemonics("JUMP(B>0)",110,most,"Saut Conditionnel (Saut si RB>0).");
+    addManyMmnemonics("JUMP(A:Pair)",115,most,"Saut Conditionnel (Saut si RA est pair).");
+    addManyMmnemonics("JUMP(B:Pair)",120,most,"Saut Conditionnel (Saut si RB est impair).");
 
-    addManyMmnemonics("PUSH",140,all,"Empile une valeur sur la pile (SP), selon mode d'adressage.");
-    addManyMmnemonics("PULL",145,most,"Dépile une valeur sur la pile (SP), selon mode d'adressage.");
+
+    mSingleAddressingModeBeginAt = 125;
     
-    addManyMmnemonics("JUMP",150,most,"Saut inconditionnel.");
-    addManyMmnemonics("JUMP(A==0)",155,most,"Saut Conditionnel (Saut si RA==0).");
-    addManyMmnemonics("JUMP(B==0)",160,most,"Saut Conditionnel (Saut si RB==0).");
-    addManyMmnemonics("JUMP(A>0)",165,most,"Saut Conditionnel (Saut si RA>0).");
-    addManyMmnemonics("JUMP(B>0)",170,most,"Saut Conditionnel (Saut si RB>0).");
-    addManyMmnemonics("JUMP(A:Pair)",175,most,"Saut Conditionnel (Saut si RA est pair).");
-    addManyMmnemonics("JUMP(B:Pair)",180,most,"Saut Conditionnel (Saut si RA est impair).");
+    addManyMmnemonics("LOAD_X",125,imm,"Copie une valeur sur X en adressage immédiat.");
+    addManyMmnemonics("LOAD_SP",126,imm,"Copie une valeur sur SP en adressage immédiat.");
 
-
-
-    addMnemonics("PUSH_A",181,"Empile la valeur contenue dans le registre RA sur la pile (SP).");
-    addMnemonics("PUSH_B",182,"Empile la valeur contenue dans le registre RB sur la pile (SP).");
-    addMnemonics("PUSH_X",183,"Empile l'adresse contenue dans le registre X sur la pile (SP).");
-    addMnemonics("PULL_A",184,"Dépile la valeur au sommet de la pile (SP) vers le registre RA.");
-    addMnemonics("PULL_B",185,"Dépile la valeur au sommet de la pile (SP) vers le registre RB.");
-    addMnemonics("PULL_X",186,"Dépile la valeur au sommet de la pile (SP) vers le registre X.");
-    addMnemonics("CALL",187,"Appel à sous-routine dont l'adresse est passée en paramètre.");
-    addMnemonics("RETURN",188,"Sortie de la sous-routine courante.");
+    addMnemonics("PUSH_A",127,"Empile la valeur contenue dans le registre RA sur la pile (SP).");
+    addMnemonics("PUSH_B",128,"Empile la valeur contenue dans le registre RB sur la pile (SP).");
+    addMnemonics("POP_A",129,"Dépile la valeur au sommet de la pile (SP) vers le registre RA.");
+    addMnemonics("POP_B",130,"Dépile la valeur au sommet de la pile (SP) vers le registre RB.");
+    addManyMmnemonics("CALL",131,dir,"Appel à sous-routine dont l'adresse est passée en paramètre.");
+    addMnemonics("RETURN",132,"Sortie de la sous-routine courante.");
 
     // bool bitwise, reg oriented
-    addMnemonics("NOT_A",189,"Inversion logique bit à bit du registre RA.");    
-    addMnemonics("NOT_B",190,"Inversion logique bit à bit du registre RB.");    
-    addMnemonics("ROR_A",191,"Rotation à droite des bits du registre RA.");    
-    addMnemonics("ROR_B",192,"Rotation à droite des bits du registre RB.");    
-    addMnemonics("ROL_A",193,"Rotation à gauche des bits du registre RA.");    
-    addMnemonics("ROL_B",194,"Rotation à gauche des bits du registre RB.");    
+    addMnemonics("NOT_A",133,"Inversion logique bit à bit du registre RA.");    
+    addMnemonics("NOT_B",134,"Inversion logique bit à bit du registre RB.");    
+    addMnemonics("ROR_A",135,"Rotation à droite des bits du registre RA.");    
+    addMnemonics("ROR_B",136,"Rotation à droite des bits du registre RB.");    
+    addMnemonics("ROL_A",137,"Rotation à gauche des bits du registre RA.");    
+    addMnemonics("ROL_B",138,"Rotation à gauche des bits du registre RB.");    
     // math, reg oriented
-    addMnemonics("ADDAB",195,"Addition RA + RB, résultat dans RB.");
-    addMnemonics("SUBAB",196,"Soustraction RA - RB, résultat dans RB.");    
-    addMnemonics("MULAB",197,"Multiplication RA x RB, résultat dans RB.");
-    addMnemonics("DIVAB",198,"Division RA / RB, résultat dans RB.");
+    addMnemonics("ADDAB",139,"Addition RA + RB, résultat dans RB.");
+    addMnemonics("SUBAB",140,"Soustraction RA - RB, résultat dans RB.");    
+    addMnemonics("MULAB",141,"Multiplication RA x RB, résultat dans RB.");
+    addMnemonics("DIVAB",142,"Division RA / RB, résultat dans RB.");
 
-    addMnemonics("ANDAB",199,"ET bit à bit RA & RB, résultat dans RB.");
-    addMnemonics("ORAB",200,"OU bit à bit RA | RB, résultat dans RB.");
-    addMnemonics("XORAB",201,"OU exclusif bit à bit RA ^ RB, résultat dans RB.");
-    addMnemonics("INC_A",202,"Incrémentation RA.");
-    addMnemonics("INC_B",203,"Incrémentation RB.");
-    addMnemonics("INC_X",204,"Incrémentation RX.");
-    addMnemonics("INC_SP",205,"Incrémentation SP.");
-    addMnemonics("DEC_A",206,"Décrémentation RA.");
-    addMnemonics("DEC_B",207,"Décrémentation RB.");
-    addMnemonics("DEC_X",208,"Décrémentation RX.");
-    addMnemonics("DEC_SP",209,"Décrémentation SP.");
-    addMnemonics("NOP",210,"Pas d'Opération");
-
+    addMnemonics("ANDAB",143,"ET bit à bit RA & RB, résultat dans RB.");
+    addMnemonics("ORAB",144,"OU bit à bit RA | RB, résultat dans RB.");
+    addMnemonics("XORAB",145,"OU exclusif bit à bit RA ^ RB, résultat dans RB.");
+    addMnemonics("INC_A",146,"Incrémentation RA.");
+    addMnemonics("INC_B",147,"Incrémentation RB.");
+    addMnemonics("INC_X",148,"Incrémentation RX.");
+    addMnemonics("INC_SP",149,"Incrémentation SP.");
+    addMnemonics("DEC_A",150,"Décrémentation RA.");
+    addMnemonics("DEC_B",151,"Décrémentation RB.");
+    addMnemonics("DEC_X",152,"Décrémentation RX.");
+    addMnemonics("DEC_SP",153,"Décrémentation SP.");
+    addMnemonics("NOP",154,"Pas d'Opération");
     
+    mLastOpCode = 155;
 
 }
 
@@ -414,8 +414,8 @@ Assembleur::drawMnemonicsWindow(ImDrawList* dl, ImVec2 window_pos){
             ImGui::TableHeadersRow();       // Draw remaining headers and allow access to context-menu and other functions.
             for (int row = 0; row < mRows; row++)
             {
-                if(row>=213)  {  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));}
-                else if(row <=180) { if(row%10 <5 ) {ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,200,255));}
+                if(row>=mLastOpCode)  {  ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,255,255));}
+                else if(row <=mSingleAddressingModeBeginAt) { if(row%10 <5 ) {ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255,255,200,255));}
                                      else {ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(200,255,255,255));}
                 }
                 else {
