@@ -1,3 +1,3 @@
 #!/bin/bash
-python3 -m http.server --bind  192.168.122.103 8000
+python3 -m http.server --bind  127.0.0.1 8000
 

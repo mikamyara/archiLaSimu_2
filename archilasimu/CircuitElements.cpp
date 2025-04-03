@@ -361,7 +361,7 @@ BasicRegister::BasicRegister(std::string inName,ImU32 inColor,ImVec2 inPos,int t
     mInputTextLabel = "##"+mName;
     mInputTextWidth = (mTextBufSize-1)*11;
     mInputTextVPos = 35;
-    minValue=0; maxValue=9999999;
+    minValue=-9999999; maxValue=9999999;
 }
 void
 BasicRegister::drawInputText(ImDrawList* dl,ImVec2 window_pos) {
@@ -630,7 +630,7 @@ CombinatorialOperator::buildOperations()
         return X|Y;
     };    
     mOperations["XOR"] = [](int X, int Y) {
-        return X|Y;
+        return X^Y;
     };    
     mOperations["ROL"] = [](int X, int Y) {
         return X>>Y;

@@ -13,16 +13,24 @@ ArchiCircuit::ArchiCircuit() {
     RA = new RegisterBus123("RA",IM_COL32(0,50,50,255),ImVec2(380,100));
     RB = new RegisterBus123("RB",IM_COL32(0,60,60,255),ImVec2(380,190));
     RX = new RegisterBus123("RX",IM_COL32(0,70,70,255),ImVec2(380,320));
+    RX->minValue = 0;
   //  RD = new RegisterBus123("RD",IM_COL32(0,80,80,255),ImVec2(380,370));
 
     OP = new CombinatorialOperator("OP",IM_COL32(20,20,100,255),ImVec2(630,150));
+    OP->minValue = 0;
     CO = new RegisterBus123("CO",IM_COL32(100,0,0,255),ImVec2(130,106));
+    CO->minValue = 0;
     RI = new InstructionRegister("RI",IM_COL32(75,0,75,255),ImVec2(130,205));
+    RI->minValue = 0;
     SP = new RegisterBus123("SP",IM_COL32(50,0,100,255),ImVec2(130,370));
+    SP->minValue = 0;
 
     RE = new RegisterBus123("RE",IM_COL32(0,80,0,255),ImVec2(15,15));
     RE->mInputs.mPosMode = e_Bottom;
+
     RAM = new RegisterBus123("RAM",IM_COL32(0,40,0,255),ImVec2(15,334));
+    RAM->minValue = 0;
+
     sensEch = new IOBox("Sens Echange",IM_COL32(0,40,0,255),ImVec2(15,200));     
     sensEch->mInputs.mPosMode = e_Bottom;sensEch->mBorderColor = sensEch->mColor;
     sensEch->mRectSize = ImVec2(90,72);
