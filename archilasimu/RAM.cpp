@@ -5,6 +5,7 @@
 #include "Assembleur.h"
 #include <regex>
 #include <string.h>
+#include <stdlib.h>
 
 RAM::RAM()  {
     mASM = nullptr;
@@ -149,7 +150,7 @@ int
 RAM::getValue(int address) {
     if (address>=0 && address <mRows) {
     int value=-1;
-    value = atoi(mData[address]);
+    value = strtol(mData[address],nullptr,10);
 
     return value;
     }
@@ -179,7 +180,7 @@ void
 RAM::insertByExpression(std::string s){
         std::regex
     rgx
-    ("^\\s*([0-9]+)\\s*[:/\\|]\\s*([0-9]*)\\s*[:/\\|](.*)");
+    ("^\\s*([0-9]+)\\s*[:/\\|]\\s*([+-]?[0-9]*)\\s*[:/\\|](.*)");
     std::smatch match;
 
     if (std::regex_search (s.cbegin (), s.cend (), match, rgx))
