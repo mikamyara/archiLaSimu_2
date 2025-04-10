@@ -59,8 +59,11 @@ endif
 CPPFLAGS += -I$(IMGUI_DIR) -I$(IMGUI_DIR)/backends
 #CPPFLAGS += -g
 CPPFLAGS += -Wall -Wformat -Os $(EMS)
-LDFLAGS += --shell-file ../libs/emscripten/shell_minimal.html -s FULL_ES2=1 -s USE_WEBGL2=1
+LDFLAGS += --shell-file $(SHELL_TEMPLATE) -s FULL_ES2=1 -s USE_WEBGL2=1
 LDFLAGS += $(EMS)
+BUILD_ID := $(shell date +%s)
+SHELL_TEMPLATE := ../libs/emscripten/shell_minimal.html
+
 
 ##---------------------------------------------------------------------
 ## BUILD RULES
@@ -86,6 +89,8 @@ serve: all
 
 $(EXE): $(OBJS) $(WEB_DIR)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+	sed -i 's|<script async type="text/javascript" src="index.js">|<script async src="index.js?v=$(BUILD_ID)">|' $(WEB_DIR)/index.html
+
 
 clean:
-	rm -rf $(OBJS) $(WEB_DIR)
+	rm -rf $(OBJS) $(WEB_DIR) $(SHELL_OUTPUT)
