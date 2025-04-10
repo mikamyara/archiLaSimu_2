@@ -34,7 +34,7 @@ void  APropos::drawMe(ImDrawList* dl, ImVec2 window_pos){
     ImGui::SetCursorPos(toHD(ImVec2{100,80}));
     ImGui::Text("Logiciel à vocation pédagogique pour la simulation d'architecture de microprocesseurs");
     ImGui::SetCursorPos(toHD(ImVec2{300,110}));
-    ImGui::Text("Version 1.9 - Avril 2025");
+    ImGui::Text("Version 2.0 - Avril 2025");
     ImGui::Dummy(toHD(ImVec2(0.0f, 20.0f)));
 
 

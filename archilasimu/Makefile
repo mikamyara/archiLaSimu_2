@@ -89,7 +89,16 @@ serve: all
 
 $(EXE): $(OBJS) $(WEB_DIR)
 	$(CXX) -o $@ $(OBJS) $(LDFLAGS)
+	# Injecte la valeur RÉELLE de BUILD_ID dans le HTML (version cache-busting)
 	sed -i 's|<script async type="text/javascript" src="index.js">|<script async src="index.js?v=$(BUILD_ID)">|' $(WEB_DIR)/index.html
+
+	# Injecte LITTÉRALEMENT $(BUILD_ID) dans le JavaScript, pour une substitution future
+	sed -i 's|var PACKAGE_NAME = '\''web/index.data'\'';|var PACKAGE_NAME = '\''web/index.$(BUILD_ID).data'\'';|' $(WEB_DIR)/index.js
+	sed -i 's|var REMOTE_PACKAGE_BASE = '\''index.data'\'';|var REMOTE_PACKAGE_BASE = '\''index.$(BUILD_ID).data'\'';|' $(WEB_DIR)/index.js
+	sed -i 's|wasmBinaryFile = '\''index.wasm'\'';|wasmBinaryFile = '\''index.$(BUILD_ID).wasm'\'';|' $(WEB_DIR)/index.js
+
+	mv $(WEB_DIR)/index.wasm $(WEB_DIR)/index.$(BUILD_ID).wasm
+	mv $(WEB_DIR)/index.data $(WEB_DIR)/index.$(BUILD_ID).data
 
 
 clean:

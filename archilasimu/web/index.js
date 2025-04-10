@@ -38,8 +38,8 @@ var Module = typeof Module != 'undefined' ? Module : {};
         // web worker
         PACKAGE_PATH = encodeURIComponent(location.pathname.toString().substring(0, location.pathname.toString().lastIndexOf('/')) + '/');
       }
-      var PACKAGE_NAME = 'web/index.data';
-      var REMOTE_PACKAGE_BASE = 'index.data';
+      var PACKAGE_NAME = 'web/index.1744302926.data';
+      var REMOTE_PACKAGE_BASE = 'index.1744302926.data';
       if (typeof Module['locateFilePackage'] === 'function' && !Module['locateFile']) {
         Module['locateFile'] = Module['locateFilePackage'];
         err('warning: you defined Module.locateFilePackage, that has been renamed to Module.locateFile (using your locateFilePackage for now)');
@@ -197,7 +197,7 @@ Module['FS_createPath']("/", "imgs", true, true);
     }
 
     }
-    loadPackage({"files": [{"filename": "/fonts/ProggyClean.ttf", "start": 0, "end": 41208}, {"filename": "/fonts/DroidSans.ttf", "start": 41208, "end": 231252}, {"filename": "/fonts/binary_to_compressed_c.cpp", "start": 231252, "end": 245044}, {"filename": "/fonts/Roboto-Bold.ttf", "start": 245044, "end": 380864}, {"filename": "/fonts/Roboto-Medium.ttf", "start": 380864, "end": 543452}, {"filename": "/fonts/Cousine-Regular.ttf", "start": 543452, "end": 587364}, {"filename": "/fonts/ProggyTiny.ttf", "start": 587364, "end": 623020}, {"filename": "/fonts/Karla-Regular.ttf", "start": 623020, "end": 639868}, {"filename": "/fonts/Roboto-Regular.ttf", "start": 639868, "end": 785216}, {"filename": "/imgs/logos.png", "start": 785216, "end": 874773}, {"filename": "/imgs/logoEEA.png", "start": 874773, "end": 898816}], "remote_package_size": 898816, "package_uuid": "79be31fa-edca-4093-8d98-ff78cff0fcb1"});
+    loadPackage({"files": [{"filename": "/fonts/ProggyClean.ttf", "start": 0, "end": 41208}, {"filename": "/fonts/DroidSans.ttf", "start": 41208, "end": 231252}, {"filename": "/fonts/binary_to_compressed_c.cpp", "start": 231252, "end": 245044}, {"filename": "/fonts/Roboto-Bold.ttf", "start": 245044, "end": 380864}, {"filename": "/fonts/Roboto-Medium.ttf", "start": 380864, "end": 543452}, {"filename": "/fonts/Cousine-Regular.ttf", "start": 543452, "end": 587364}, {"filename": "/fonts/ProggyTiny.ttf", "start": 587364, "end": 623020}, {"filename": "/fonts/Karla-Regular.ttf", "start": 623020, "end": 639868}, {"filename": "/fonts/Roboto-Regular.ttf", "start": 639868, "end": 785216}, {"filename": "/imgs/logos.png", "start": 785216, "end": 874773}, {"filename": "/imgs/logoEEA.png", "start": 874773, "end": 898816}], "remote_package_size": 898816, "package_uuid": "4d800c18-1d81-4462-a22c-a19bdf7a03ed"});
 
   })();
 
@@ -1725,7 +1725,7 @@ function createExportWrapper(name, fixedasm) {
 }
 
 var wasmBinaryFile;
-  wasmBinaryFile = 'index.wasm';
+  wasmBinaryFile = 'index.1744302926.wasm';
   if (!isDataURI(wasmBinaryFile)) {
     wasmBinaryFile = locateFile(wasmBinaryFile);
   }
