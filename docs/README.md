@@ -1,9 +1,9 @@
 Archi La Simu 2
 =====
 
-<center><b><i>A Web navigator based Von-Neuman Architecture simulator</i></b></center>
-<center><b><i>Apr. 2025 - Mikhael Myara, Arnaud Virazel, University of Montpellier</i></b></center>
-<center><b><i>Licence GPLv3</i></b></center>
+<center><b><i>A Web navigator based Von-Neuman Architecture simulator</i></b></center><br\>
+<center><i>Apr. 2025 - Mikhael Myara, Arnaud Virazel, University of Montpellier</i></center><br\>
+<center><i>Licence GPLv3</i></center>
 
 ----
 
@@ -15,7 +15,7 @@ It is a raw copy of my work folder on my computer. I have no time to manage pull
 ### Self Hosting
 Simply make a raw copy of the contents of `archilasimu\web` in any sub-folder hosted by a web-server.
 
-## Code Organization
+### Code Organization
 The code is a Dear ImGUI project that has been configured to work with webassembly / emscripten. The em++ version I use is :
 ```bash
 $ em++ --version
