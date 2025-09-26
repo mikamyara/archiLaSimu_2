@@ -19,6 +19,7 @@
 #include "ArchiTheme.h"
 #include "CPU.h"
 #include "Assembleur.h"
+#include "OptionManager.h"
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -63,6 +64,7 @@ ArchiLaSimuApp::customInit ()
     mCPU = new CPU();
     mRAM = new RAM();
     mExternalBus = new ExtBus();
+    mOptions = new OptionManager(this);
     
     mRAM->mASM = mASM;
     mASM->mRAM = mRAM;
@@ -73,7 +75,10 @@ ArchiLaSimuApp::customInit ()
     mCPU->Rebuild();
     mCPU->Reset();    
 
-    mAPropos = new APropos();
+    
+    mAPropos = new APropos(this);
+
+    mOptions->fetchOptions();
 
     return 0;
 }
@@ -125,6 +130,9 @@ ArchiLaSimuApp::drawMainWindow() {
     ImGui::Checkbox ("A Propos de Archi la simu ...", &mAPropos->mShowMe);	// Edit bools storing our window open/close state
     mAPropos->drawMe(draw_list,window_pos);
     ImGui::SetCursorPos(ImVec2(0,0));
+    mOptions->renderLoadingPopup();
+    mOptions->renderErrorPopup();
+
     //ImGui::Image((void*)(intptr_t)logo_eea_tid, ImVec2(logo_eea_w, logo_eea_h));
 
 
@@ -212,4 +220,22 @@ ArchiLaSimuApp::drawOtherWindow() {
         ImGui::End ();
     }
 
+}
+
+
+void 
+ArchiLaSimuApp::getOptions(std::map<std::string, std::string> & opt) {
+
+    opt_disableLoadRam = std::stoi(opt["charger_ram_off"]);
+    opt_disableSaveRam = std::stoi(opt["enregistrer_ram_off"]);
+    opt_disableLoadMicrocode = std::stoi(opt["charger_microcode_off"]);
+    opt_disableSaveMicrocode = std::stoi(opt["enregistrer_microcode_off"]);
+    
+    mRAM->disableLoad = opt_disableLoadRam;
+    mRAM->disableSave = opt_disableSaveRam;
+    
+    mCPU->disableLoad = opt_disableLoadMicrocode;
+    mCPU->disableSave = opt_disableSaveMicrocode;
+    
+   // std::cout << opt_disableLoadRam <<" "<<opt_disableSaveRam <<" "<< opt_disableLoadMicrocode<<" "<<opt_disableSaveMicrocode <<"\n";
 }

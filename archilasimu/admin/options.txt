@@ -1,0 +1,7 @@
+# options.txt
+# Format INF-like
+
+charger_ram_off=0
+enregistrer_ram_off=0
+charger_microcode_off=0
+enregistrer_microcode_off=0

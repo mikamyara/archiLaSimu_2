@@ -23,3 +23,5 @@ std::string trim(const std::string& str);
 std::string toUpper (std::string inStr);
 bool explode(const std::string input, std::vector < std::string > &result);
 std::vector<std::string> splitString(const std::string& input, char separator);
+extern "C" void get_full_url_into(char* buffer, int maxLen);
+extern "C" void get_base_url_into(char* buffer, int maxLen);

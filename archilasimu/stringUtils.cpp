@@ -18,6 +18,7 @@
 #include <regex>
 #include <iostream>
 #include <vector>
+#include <emscripten.h>
 
 
 std::string 
@@ -76,3 +77,17 @@ std::vector<std::string> splitString(const std::string& input, char separator) {
 
     return result;
 }
+
+
+// Remplit un buffer C++ avec l'URL complète
+EM_JS(void, get_full_url_into, (char* buffer, int maxLen), {
+    var url = window.location.href;
+    stringToUTF8(url, buffer, maxLen);
+});
+
+// Remplit un buffer C++ avec l'URL de base (dossier)
+EM_JS(void, get_base_url_into, (char* buffer, int maxLen), {
+    var loc = window.location;
+    var base = loc.origin + loc.pathname.replace(/[^\\/]*$/, "");
+    stringToUTF8(base, buffer, maxLen);
+});

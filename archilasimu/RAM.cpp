@@ -25,6 +25,8 @@
 #include <stdlib.h>
 
 RAM::RAM()  {
+    disableLoad = 1;
+    disableSave = 1;
     mASM = nullptr;
     mRamFiles = nullptr;
 
@@ -102,13 +104,18 @@ RAM::drawWidgets(ImDrawList* dl, ImVec2 window_pos) {
     mASM->drawOpcodeBuilderWindow(dl,pos);
     pos.x+=30; pos.y+=46;
     ImGui::SetCursorPos (toHD(pos));
+    ImGui::BeginDisabled(disableLoad==1);
     if(ImGui::Button("Charger RAM")) {
         mRamFiles->Upload();
     }
+    ImGui::EndDisabled();
     ImGui::SameLine();
+    ImGui::BeginDisabled(disableSave==1);
     if(ImGui::Button("Enregistrer RAM")) {
         mRamFiles->Download();
     }
+    ImGui::EndDisabled();
+
 
 
     static ImGuiTableFlags table_flags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_ScrollY | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_Hideable  | ImGuiTableFlags_Reorderable | ImGuiTableFlags_HighlightHoveredColumn; // ImGuiTableFlags_Resizable

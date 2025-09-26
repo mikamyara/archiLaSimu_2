@@ -18,13 +18,13 @@ CXX = em++
 WEB_DIR = web
 EXE = $(WEB_DIR)/index.html
 IMGUI_DIR = ..
-SOURCES = main.cpp stringUtils.cpp imGuiApp.cpp ArchiLaSimuApp.cpp CircuitElements.cpp ArchiTheme.cpp ArchiCircuit.cpp CPU.cpp RAM.cpp Sequencer.cpp MicrocodeTable.cpp Assembleur.cpp APropos.cpp CodeUploadDownload.cpp
+SOURCES = main.cpp stringUtils.cpp imGuiApp.cpp ArchiLaSimuApp.cpp CircuitElements.cpp ArchiTheme.cpp ArchiCircuit.cpp CPU.cpp RAM.cpp Sequencer.cpp MicrocodeTable.cpp Assembleur.cpp APropos.cpp CodeUploadDownload.cpp OptionManager.cpp
 SOURCES += $(IMGUI_DIR)/imgui.cpp $(IMGUI_DIR)/imgui_demo.cpp $(IMGUI_DIR)/imgui_draw.cpp $(IMGUI_DIR)/imgui_tables.cpp $(IMGUI_DIR)/imgui_widgets.cpp
 SOURCES += $(IMGUI_DIR)/backends/imgui_impl_glfw.cpp $(IMGUI_DIR)/backends/imgui_impl_opengl3.cpp
 OBJS = $(addsuffix .o, $(basename $(notdir $(SOURCES))))
 UNAME_S := $(shell uname -s)
 CPPFLAGS = 
-LDFLAGS = -sEXPORTED_FUNCTIONS=[_main,_malloc,_free] -sEXPORTED_RUNTIME_METHODS=[ccall] -sALLOW_MEMORY_GROWTH=1 
+LDFLAGS = -sEXPORTED_FUNCTIONS=[_main,_malloc,_free,_optionsDownloadSucceeded,_optionsDownloadFailed] -sEXPORTED_RUNTIME_METHODS=[ccall] -sALLOW_MEMORY_GROWTH=1 
 EMS =
 
 ##---------------------------------------------------------------------
@@ -33,6 +33,7 @@ EMS =
 
 # ("EMS" options gets added to both CPPFLAGS and LDFLAGS, whereas some options are for linker only)
 EMS += -s DISABLE_EXCEPTION_CATCHING=1
+EMS += -s FETCH=1
 LDFLAGS += -s USE_GLFW=3 -s USE_WEBGL2=1 -s  WASM=1 -s ALLOW_MEMORY_GROWTH=1 -s NO_EXIT_RUNTIME=0 -s ASSERTIONS=1
 
 # Uncomment next line to fix possible rendering bugs with Emscripten version older then 1.39.0 (https://github.com/ocornut/imgui/issues/2877)
@@ -95,8 +96,8 @@ $(EXE): $(OBJS) $(WEB_DIR)
 	# Injecte LITTÉRALEMENT $(BUILD_ID) dans le JavaScript, pour une substitution future
 	sed -i 's|var PACKAGE_NAME = '\''web/index.data'\'';|var PACKAGE_NAME = '\''web/index.$(BUILD_ID).data'\'';|' $(WEB_DIR)/index.js
 	sed -i 's|var REMOTE_PACKAGE_BASE = '\''index.data'\'';|var REMOTE_PACKAGE_BASE = '\''index.$(BUILD_ID).data'\'';|' $(WEB_DIR)/index.js
-	sed -i 's|wasmBinaryFile = '\''index.wasm'\'';|wasmBinaryFile = '\''index.$(BUILD_ID).wasm'\'';|' $(WEB_DIR)/index.js
-
+	sed -i "s|var f = 'index.wasm';|var f = 'index.${BUILD_ID}.wasm';|" $(WEB_DIR)/index.js
+	cp -r ./admin $(WEB_DIR)/
 	mv $(WEB_DIR)/index.wasm $(WEB_DIR)/index.$(BUILD_ID).wasm
 	mv $(WEB_DIR)/index.data $(WEB_DIR)/index.$(BUILD_ID).data
 

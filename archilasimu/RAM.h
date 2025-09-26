@@ -42,4 +42,8 @@ public:
     RamFiles* mRamFiles;
 
     Assembleur* mASM;
+
+    // options
+    int disableLoad;
+    int disableSave;
 };

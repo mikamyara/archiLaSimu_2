@@ -22,6 +22,7 @@
 #include "RAM.h"
 #include "Assembleur.h"
 #include "APropos.h"
+#include "OptionManager.h"
 
 class ArchiLaSimuApp : public imGuiApp {
 public :
@@ -34,6 +35,7 @@ public :
     void DrawFramebufferInImGui( );
     void drawMainWindow();
     void drawOtherWindow();
+    void getOptions(std::map<std::string, std::string>& opt );
 
     ImFont *m_customFont;
     bool m_show_demo_window ;
@@ -43,9 +45,14 @@ public :
     RAM* mRAM;
     ExtBus* mExternalBus;
     Assembleur* mASM;
-
-
+    OptionManager* mOptions;
     APropos* mAPropos;
+
+    // software options
+    int opt_disableLoadRam;
+    int opt_disableSaveRam;
+    int opt_disableLoadMicrocode;
+    int opt_disableSaveMicrocode;
 
 };
 

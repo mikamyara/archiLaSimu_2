@@ -18,14 +18,17 @@
 #pragma once
 #include <imgui.h>
 #include "ArchiTheme.h"
+class ArchiLaSimuApp;
 
 class APropos {
     public:
-    APropos();
+    APropos(ArchiLaSimuApp* inApp);
     void drawMe(ImDrawList* dl, ImVec2 window_pos);
 
 
     GLuint logo_eea_tid;
     int logo_eea_w,logo_eea_h;    
     bool mShowMe;
+    ArchiLaSimuApp* mApp;
+
 };

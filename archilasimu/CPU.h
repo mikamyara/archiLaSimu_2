@@ -61,4 +61,8 @@ public :
     int mFetchCodeLine;
     bool mAlertMicrocodeTable;
 
+
+    //options
+    int disableLoad;
+    int disableSave;
 };

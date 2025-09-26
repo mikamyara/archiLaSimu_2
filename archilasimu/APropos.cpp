@@ -16,10 +16,12 @@
  */
 #include "APropos.h"
 #include "ArchiTheme.h"
+#include "stringUtils.h"
 #include <iostream>
-APropos::APropos() {
+#include "ArchiLaSimuApp.h"
+APropos::APropos(ArchiLaSimuApp* inApp) {
     mShowMe=false;
-
+    mApp = inApp;
     LoadImage("imgs/logos.png",&logo_eea_tid,&logo_eea_w,&logo_eea_h);
 
 
@@ -50,7 +52,7 @@ void  APropos::drawMe(ImDrawList* dl, ImVec2 window_pos){
     ImGui::SetCursorPos(toHD(ImVec2{100,80}));
     ImGui::Text("Logiciel à vocation pédagogique pour la simulation d'architecture de microprocesseurs");
     ImGui::SetCursorPos(toHD(ImVec2{300,110}));
-    ImGui::Text("Version 2.0 - Avril 2025");
+    ImGui::Text("Version 2.1 - Septembre 2025");
     ImGui::Dummy(toHD(ImVec2(0.0f, 20.0f)));
 
 
@@ -86,10 +88,19 @@ void  APropos::drawMe(ImDrawList* dl, ImVec2 window_pos){
     text+="pilotés par la table de microcode, et aussi vérifier que l'action voulue est bien réalisée pour les instructions qui ont été ";
     text+="décrites dans la table de microcode.\n\n";
     text+="Enfin, si on décrit les instructions utiles dans la table de microcode, on peut exécuter un programme en assembleur en pas à pas.\n\n\n\n";
-    
-     
-
-
+    char URL[256]; get_base_url_into(URL,256);
+    text+="Hébergé à : ";
+    text+=URL;
+    text+="\n\n";
+    text+="Fonctionnalités désactivées : ";
+    int opts = 0;
+    if(mApp->opt_disableLoadRam == 1) {text+=" / Chargement de la RAM "; opts++;}
+    if(mApp->opt_disableSaveRam == 1) {text+=" / Enregistrement de la RAM ";opts++;}
+    if(mApp->opt_disableLoadMicrocode == 1) {text+=" / Chargement du Microcode ";opts++;}
+    if(mApp->opt_disableSaveMicrocode == 1) {text+=" / Enregistrement du Microcode ";opts++;}
+    if(opts==0){ text+="Aucune";}
+    else {text+=" / ";}
+    text+="\n\n\n\n";
     ImGui::TextWrapped("%s",text.c_str());
 
 

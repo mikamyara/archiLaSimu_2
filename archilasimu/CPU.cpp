@@ -23,6 +23,8 @@
 #include "imGuiApp.h"
 CPU::CPU() {
     //pinSize = ImVec2(8,4);
+    disableLoad=1;
+    disableSave=1;
     mPos = ImVec2(450,10);
     mRectPos = ImVec2(0,0);
     //mRectSize = ImVec2(1000,500);
@@ -201,14 +203,19 @@ CPU::drawWidgets(ImDrawList* dl, ImVec2 pos) {
     pos.x +=500+140;
 
     ImGui::SetCursorPos (toHD(pos));    
+    ImGui::BeginDisabled(disableLoad==1);
     if (ImGui::Button("   Charger Table   \n      Microcode"))
     {mMicrocodeFiles->Upload();
     }   
+    ImGui::EndDisabled();
+
     pos.y +=50;
-    ImGui::SetCursorPos (toHD(pos));         
+    ImGui::SetCursorPos (toHD(pos));     
+    ImGui::BeginDisabled(disableSave==1);
     if (ImGui::Button("Enregistrer Table\n       Microcode"))
     {mMicrocodeFiles->Download();
     }    
+    ImGui::EndDisabled();
 
     pos = savePos;
     mArchiCircuit->drawWidgets(dl,pos);
