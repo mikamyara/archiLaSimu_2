@@ -91,6 +91,12 @@ void OptionManager::fetchOptions() {
     char URL[256]; get_base_url_into(URL,256);
     std::string str = URL;
     str += "/admin/options.txt";
+
+    // cache busting
+    double now = emscripten_get_now(); // millisecondes
+    str += "?nocache=" + std::to_string((int)now); // ou utilise rand() si tu préfères
+
+
     emscripten_fetch(&attr,str.c_str());
 }
 
